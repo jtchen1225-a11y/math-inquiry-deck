@@ -203,11 +203,13 @@ def main():
                 for phase, (kind, page_title, prompt) in enumerate(phases):
                     slide = {'id': 'ch%d-s%d-p%d' % (i,k+1,phase), 'kind': kind, 'phase': phase,
                              'sec': code, 'secName': sec[len(code):].strip() or code,
-                             'title': page_title, 'prompt': prompt}
+                             'title': page_title, 'prompt': prompt,
+                             'theme': ['citrus','ocean','teal','violet','coral'][phase],
+                             'worksheet': sec}
                     if kind == 'question':
                         slide['choices'] = ['我同意', '我不同意', '需要更多證據']
                     chapter['slides'].append(slide)
-            config = {'mode': 'inquiry', 'id': os.path.basename(out), 'version': 1,
+            config = {'mode': 'inquiry', 'id': os.path.basename(out), 'version': 2, 'scratchpad': True,
                       'phases': ['先判斷', '動手調配', '記錄數據', '提出論證', '應用遷移']}
             src = ('window.DECK_CONFIG = ' + json.dumps(config, ensure_ascii=False) + ';\n' if i == 1 else '') + \
                   'window.DECK = window.DECK || [];\nwindow.DECK.push(' + json.dumps(chapter, ensure_ascii=False, indent=2) + ');\n'

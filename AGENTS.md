@@ -5,7 +5,9 @@
 - 修改資產後執行 `python scripts/build_demo.py` 同步 demo/juice。
 - 維持 review 與 inquiry 雙模式，課程來源為 examples/juice-lesson.js。
 - 計算集中在 assets/inquiry-model.js，新增模型須有實際數值驗證。
-- 問題先於結論，作答與快照跨頁保存，學生文字安全呈現。
+- 問題先於結論，以紙本工作紙作答、一組共用一部 iPad；配方比較與臨時書寫只留於當次分頁記憶體。
+- 不加入作答持久儲存或紀錄匯出，保留可選的打字／手寫草算區，文字安全呈現。
+- 依內容選擇頁面 theme；維持字色對比，顏色不作唯一訊息。
 - 不提交原始 DOCX、學生作答匯出、密鑰或本機工具設定。
-- GitHub 可見性與發布依使用者授權，不自行開啟 Pages。
+- 使用者已授權此公開 Repo 部署 GitHub Pages；main 通過 Chromium／WebKit 檢查後部署。
 - 預期 Obsidian vault：`G:\我的雲端硬碟\secondbrain`。建立時 MCP 回報路徑不存在，尚未建立專案筆記；恢復後再同步，勿寫入其他 vault。

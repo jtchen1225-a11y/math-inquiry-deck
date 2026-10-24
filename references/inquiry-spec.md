@@ -6,7 +6,8 @@
 window.DECK_CONFIG = {
   mode: 'inquiry',
   id: 'my-lesson', // 同一課程保持穩定；同網域的不同課程不可共用 id
-  version: 1,     // 改變作答欄位或模型時升版；舊版資料不自動遷移
+  version: 2,
+  scratchpad: true, // 顯示可展開的臨時打字／手寫區
   phases: ['先判斷','動手調配','記錄數據','提出論證','應用遷移']
 };
 window.DECK = [{
@@ -15,6 +16,7 @@ window.DECK = [{
   slides: [{
     id: 'initial-claim', kind: 'question', phase: 0,
     sec: '1-1', secName: '情境探究',
+    theme: 'citrus', worksheet: '一｜情境判斷',
     title: '你會如何判斷？',
     prompt: '提出有討論空間的真實問題。',
     choices: ['我同意','我不同意','需要更多證據'],
@@ -29,41 +31,45 @@ window.DECK = [{
 
 | kind | 功能 | 適用範圍 |
 | --- | --- | --- |
-| question | 單選猜想與理由，可選擇提供 choices | 通用 |
-| task | 任務文字與作答欄 | 通用 |
-| practice / rule | 作答欄與分段提示 | 通用 |
-| argument | 四步論證，欄位以頁面 id 隔離 | 通用 |
+| question | 小組選擇猜想，理由寫在工作紙，可提供 choices | 通用 |
+| task | 任務文字與紙本提示 | 通用 |
+| practice / rule | 紙本提示與分段揭示 | 通用 |
+| argument | 四步論證引導卡，正式內容寫在工作紙 | 通用 |
 | annotation | 1 份果汁／4 份清水標註 | 果汁範例專用 |
-| lab | 四杯實驗、滑桿、數值切換、數據快照 | 果汁範例專用 |
+| lab | 四杯實驗、滑桿、數值切換、本輪配方比較 | 果汁範例專用 |
 | representation | 1:4 的五格份數模型 | 果汁範例專用 |
 | records | 杯型、配比、比值、總份數、濃度表 | 果汁範例專用 |
 | scale | 1:4 等比例放大 | 果汁範例專用 |
-| percent | 25% 的百格圖與作答 | 果汁範例專用 |
+| percent | 25% 百格圖與紙本作答提示 | 果汁範例專用 |
 | algorithm | 15,000 mL 配比與 800 mL 瓶數任務 | 果汁範例專用 |
-| reflection | 回看本課初始猜想、自評及離堂題 | 果汁範例專用 |
+| reflection | 回看工作紙初始猜想、自評及離堂題 | 果汁範例專用 |
 
-`reveals: ['提示','證據','解釋']` 為可選字串陣列。課程設定增加 `experiment: 'juice'` 時，argument 頁會顯示可勾選的果汁快照。
+`reveals: ['提示','證據','解釋']` 為可選字串陣列。課程設定增加 `experiment: 'juice'` 時，argument 頁會顯示可勾選的本輪比較配方。
 
 新增其他科目的互動：在 inquiry.js 的 activity() 新增頁型，對 render() 綁定事件，在 verify_deck.js 的 kinds 加入名稱，必要時新增純模型及測試。原版 review 的 visual(h) 不會在 inquiry 模式自動執行；不要把舊 visual 塞入 task 並預期渲染。
 
-## 狀態與生命週期
+## 頁面配色與工作紙對照
 
-原引擎每次翻頁重建 DOM。Inquiry 模組先保存狀態，再從狀態重建；不可把唯一資料留在 DOM。
+`theme` 可選 citrus（橙）、ocean（藍）、teal（青綠）、lime（草綠）、violet（紫）、coral（珊瑚紅）、berry（莓紅）。未設定時按 phase 選擇；每頁可按內容改色，不必同章同色。
 
-- 儲存鍵：`math-inquiry:<id>:v<version>`。
-- answers：以欄位 id 保存字串；學生輸入一律轉義呈現。
-- reveal：以頁面 id 保存提示層數。
-- cups：目前配方；records：按下記錄時複製的數值，兩者分離。
-- 同一杯、同一配方重複記錄更新該筆；不同配方新增快照。
-- 勾選引用只保存快照 id，不宣稱能自動判斷論證品質。
-- 匯出 JSON 含課程 id、時間、作答與快照；無自動上傳、後台、匯入或跨裝置同步。
-- localStorage 失敗時降級為記憶體操作，提示匯出；清除只影響本課狀態。
+也可設定六位 HEX 色碼物件，例如 `theme: {accent:'#126b9b', soft:'#dff4ff', wash:'#f0faff', ink:'#124861', secondary:'#7544aa'}`；未指定的值使用階段預設。自訂配色須自行檢查對比。phase 流程列保留五階段固定識別色，不把階段或狀態僅用顏色表達。
 
-教師以自己的投影裝置示範，學生可配合紙本；若學生各自開啟網址，資料保存在各自裝置，教師不會自動收到。
+`worksheet` 指定工作紙位置，會顯示在任務下方。臨時書寫預設收合；課程或單頁的 `scratchpad: false` 可關閉。正式作答欄已移除，演算法題改為分步任務與逐層核對。
+
+## 當次互動狀態
+
+原引擎翻頁會重建 DOM。當次分頁用記憶體維持滑桿、選擇、配方比較、提示及臨時筆記，讓同一次討論能往返頁面；重新整理、關閉或「重新開始本課」即清空。
+
+- 不讀寫 localStorage、sessionStorage 或 IndexedDB，不匯入 v1 舊作答。
+- 不建立 Blob 下載，不提供紀錄匯出或後台收集。
+- 比較配方是按下「加入比較」時複製的數值，不跟隨後續滑桿改變。
+- 文字草稿以安全文字呈現；手寫區用 Pointer Events，支援手指與觸控筆；尺寸變更以相對座標重畫。
+- 手寫區收合後仍可在本分頁展開；資料不可跨重新整理保留。
+- 教師與學生使用紙本作答，小組共用一部 iPad 輪流操作與報告，不需帳號。
 
 ## 版面與相容性
 
-inquiry.css 只覆寫 `.inquiry-mode` 或探究專用類別，不改 review 頁型。長活動可垂直捲動。原導覽、畫筆、雷射筆與全螢幕仍使用 engine.js。探究模式跳過 MathJax 排版，無外部字體請求；若新課程需要 LaTeX，須自行加入依賴並更新離線使用說明。
+inquiry.css 只覆寫 `.inquiry-mode` 或探究專用類別，不改 review 頁型。iPad 橫向可並排四杯、直向雙欄，小螢幕單欄；各活動標示工作紙位置。長活動可垂直捲動。原導覽、畫筆、雷射筆與全螢幕仍使用 engine.js。探究模式跳過 MathJax 排版，無外部字體請求；若新課程需要 LaTeX，須自行加入依賴並更新離線使用說明。
 
 原引擎深連結 `#p=N` 使用從 0 開始的索引：`#p=2` 是第 3 頁；`#present` 直接進入第一頁。
 

@@ -200,6 +200,9 @@ DECK.forEach((chap, ci) => {
       inquiryIds.add(s.id);
       const kinds = ['question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
       if (!kinds.includes(s.kind)) err(`${tag}：未知 kind ${s.kind}`);
+      const themes = ['citrus','ocean','lime','coral','violet','berry','teal'];
+      if (s.theme && typeof s.theme === 'string' && !themes.includes(s.theme)) err(`${tag}：未知 theme ${s.theme}`);
+      if (s.theme && typeof s.theme === 'object' && Object.values(s.theme).some(v => !/^#[0-9a-f]{6}$/i.test(v))) err(`${tag}：自訂 theme 須使用六位色碼`);
       if (!Number.isInteger(s.phase) || s.phase < 0 || s.phase > 4) err(`${tag}：phase 須為 0 至 4`);
       if (s.reveals && (!Array.isArray(s.reveals) || s.reveals.some(t => typeof t !== 'string'))) err(`${tag}：reveals 須為字串陣列`);
       if (s.kind === 'question' && s.choices && (!Array.isArray(s.choices) || s.choices.length < 2)) err(`${tag}：choices 至少兩項`);

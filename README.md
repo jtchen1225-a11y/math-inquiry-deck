@@ -2,9 +2,15 @@
 
 以 **先判斷 → 動手調配 → 記錄數據 → 提出論證 → 應用遷移** 為主軸的課堂探究網頁簡報框架。
 
-從 [mathruffian-dot/math-review-deck](https://github.com/mathruffian-dot/math-review-deck) 延伸，保留原版複習模式、章節導覽、畫筆、雷射筆與全螢幕，新增問題導向頁型、分段提示、作答保存與實驗證據引用。內附 **小六數學「果汁濃度與比值的本質」12 頁示範課**。
+從 [mathruffian-dot/math-review-deck](https://github.com/mathruffian-dot/math-review-deck) 延伸，保留原版複習模式、章節導覽、畫筆、雷射筆與全螢幕，新增內容主題配色、分段提示、配方比較及臨時打字／手寫。以「一組一部 iPad、正式答案寫在工作紙」設計。內附 **小六數學「果汁濃度與比值的本質」12 頁示範課**。
 
-## 先試用示範課
+## 線上使用
+
+**[開啟果汁探究課](https://jtchen1225-a11y.github.io/math-inquiry-deck/demo/juice/)** · [網站入口](https://jtchen1225-a11y.github.io/math-inquiry-deck/)
+
+小組用同一部 iPad 操作，學生各自在對應工作紙填寫判斷、數據與論證。
+
+## 本機試用
 
 下載或 clone Repo，進入專案資料夾，執行：
 
@@ -20,19 +26,21 @@ python -m http.server 8890
 
 | 頁 | 活動 | 操作 |
 | --- | --- | --- |
-| 1–2 | 先判斷與審題 | 比較三款標籤，記錄猜想；標註基準量與變數 |
+| 1–2 | 先判斷與審題 | 比較標籤、口頭猜想，在工作紙寫理由並標註基準量 |
 | 3–4 | 動手調配 | A/B/C/D 四杯並排；切換固定果汁、自由調配、比值與濃度 |
-| 5–7 | 記錄與歸納 | 實驗快照、等比例放大、分段提示與規律發現 |
-| 8 | 數學小法庭 | 引用快照，完成主張、證據、道理與反駁 |
+| 5–7 | 記錄與歸納 | 本輪配方比較、等比例放大、提示與紙本規律發現 |
+| 8 | 數學小法庭 | 對照數據，完成紙本主張、證據、道理與反駁 |
 | 9–11 | 應用遷移 | 檸檬紅茶、25% 轉部分比部分、15 公升調配與瓶數 |
-| 12 | 反思與自評 | 回看最初判斷、離堂題、三項自我評估 |
+| 12 | 反思與自評 | 對照工作紙的初始判斷、離堂題與自評 |
 
-- 「記錄這杯」保存快照，後續拖動不會改寫舊配方。
+- 「加入比較」暫放配方，後續拖動不會改寫比較台；正式數據抄到工作紙。
 - 「需要提示」逐層揭示，開場不直接呈現結論。
-- 作答與操作保存在目前瀏覽器，跨頁與重新整理後保留。
-- 「匯出課堂紀錄」下載 JSON；「重設本課」確認後清除此課紀錄。
+- 不提供作答儲存或紀錄匯出，重新整理即清空當次操作與臨時書寫。
+- 可展開臨時書寫區，使用打字、手指或觸控筆草算；無須完成線上表單。
+- 「重新開始本課」確認後清空本輪操作、比較與草稿。
+- 每頁自動按內容換色，支援 citrus、ocean、teal、lime、violet、coral、berry 七種主題。
 - ← → 翻頁；輸入框、按鈕與滑桿保留原生按鍵操作。L 雷射筆、P 畫筆、C 清除筆跡。
-- 表單較長的探究頁允許頁內捲動，以保留可讀字級。手機使用底部教具列。
+- 表單較長的探究頁允許頁內捲動，以保留可讀字級。iPad 與手機使用底部教具列。
 
 ### 數學模型
 
@@ -55,7 +63,7 @@ node scripts/verify_deck.js my-lesson
 python -m http.server 8890 --directory my-lesson
 ```
 
-每節產生五階段骨架。編輯輸出中的 `ch1.js`，替換問題、任務及提示。一般 `question`、`task`、`argument` 頁型可跨主題；果汁實驗等專用頁型需依新課題修改。見 [探究模式規格](references/inquiry-spec.md)。
+每節產生五階段骨架。編輯輸出中的 `ch1.js`，替換問題、任務、提示、`worksheet` 對照位置及 `theme`。一般 `question`、`task`、`argument` 頁型可跨主題；果汁實驗等專用頁型需依新課題修改。見 [探究模式規格](references/inquiry-spec.md)。
 
 重新產生內附果汁示範課：
 
@@ -91,12 +99,15 @@ python tests/generator_test.py
 
 ```powershell
 npm install --no-save --package-lock=false playwright@1.62.1
-npx playwright install chromium
+npx playwright install chromium webkit
 # 另一個終端先執行 python -m http.server 8890
+node tests/browser.cjs
+# WebKit（接近 Safari 的引擎）
+$env:TEST_ENGINE="webkit"
 node tests/browser.cjs
 ```
 
-測試預設連線 `http://127.0.0.1:8890`。可用 `BASE_URL`、`PLAYWRIGHT_MODULE`、`BROWSER_EXECUTABLE` 指定網址、套件與瀏覽器位置；`SCREENSHOT_DIR` 可輸出截圖。GitHub Actions 執行數學模型、結構、雙模式產生器及瀏覽器測試。
+測試預設連線 `http://127.0.0.1:8890`。可用 `BASE_URL`、`PLAYWRIGHT_MODULE`、`BROWSER_EXECUTABLE` 指定網址、套件與瀏覽器位置；`SCREENSHOT_DIR` 可輸出截圖。GitHub Actions 執行數學模型、結構、雙模式產生器、Chromium 與 WebKit 瀏覽器測試，再部署 Pages。
 
 離線驗證器只檢查探究頁結構，不代替瀏覽器操作；舊複習驗證器使用模擬 DOM，滑桿掃描有上限。詳見 [驗證紀錄](references/validation.md)。
 
@@ -112,13 +123,21 @@ references/              規格、教師引導、驗證及上游文件
 SKILL.md                 AI 製作探究課的工作規則
 ```
 
-## 資料保存與分享
+## 紙本作答與臨時書寫
 
-作答不傳送至伺服器，沒有教師後台、跨裝置同步或多人即時協作。儲存依瀏覽器來源（網域與連接埠）、課程 id、版本區分；更換後不自動帶入舊資料。共用裝置下課前請先匯出，再重設。儲存被禁止時會提示只能暫存，仍可匯出。
+正式判斷、數據、四步論證、計算及自評寫在紙本工作紙。網站提供操作、觀察、討論提示與可選草算空間，不是線上作答或收集成績系統。
+
+小組的選擇、滑桿、比較配方、提示進度及臨時文字／筆跡只存在目前分頁的記憶體，可在同一分頁翻頁討論；重新整理或關閉即消失。不讀寫 localStorage、sessionStorage 或 IndexedDB，不提供紀錄匯出、上傳、跨裝置同步。v1 的舊作答不會載入新版。
+
+`scratchpad: false` 可在課程或單頁關閉臨時書寫區。筆跡以相對座標繪製，旋轉 iPad 後保持比例；頁面其他位置仍可正常捲動。
 
 參考答案在前端程式內，適合教學揭示，不具考試保密功能。
 
-Repo 或產生的資料夾可放到靜態主機。本次建立 Repo 不會自動開啟 GitHub Pages；參考 [部署文件](references/deploy.md)，服務方案及操作以供應商當時文件為準。
+## GitHub Pages 部署
+
+此 Repo 已設定 GitHub Pages。main 推送通過模型、產生器、Chromium 及 WebKit 測試後，自動發布入口與 `demo/juice/`。公開網站網址不依賴本機 localhost，學生可直接在 iPad 開啟。
+
+新 fork 如需 Pages，先到 Settings → Pages 選 GitHub Actions，並確認 Actions 可部署至 github-pages 環境。部署流程只打包入口與示範課，不把原始 Word、測試或課堂草稿放入網站。
 
 ## 授權與來源
 
