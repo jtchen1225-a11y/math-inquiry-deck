@@ -33,7 +33,7 @@
  case 'split':controls=R('總數','n',d.n,1,10)+B('移一個到左盤','left')+B('移一個到右盤','right')+B('交換兩盤','swap-split');d.left=Math.min(d.left,d.n);scene=`<div class="p-two">${panel('左盤',dots(d.left,0,'right'))}${panel('右盤',dots(d.n-d.left,1,'left'))}</div>`;data=d.proof?`${d.left}＋${d.n-d.left}＝${d.n}；兩盤合起來的總數沒有改變。`:'點圓片或按按鈕移動，每次只移一個。也可以有一盤是0。';break;
  case 'add':controls=R('原有紅圓片','a',d.a,0,9)+R('加入黃圓片','b',d.b,0,9)+B('交換兩群位置','swap-add');scene=`<div class="p-two">${panel('紅色一群',dots(d.a,0))}${panel('黃色一群',dots(d.b,4))}</div>`;data=d.proof?`${d.a}＋${d.b}＝${d.a+d.b}；${d.b}＋${d.a}＝${d.b+d.a}。`:'交換的是位置。請檢查是否真的加入或拿走了圓片。';break;
  case 'subtract':{
-  controls=B('拿走一個','take')+B('全部拿走','take-all')+B('放回全部','restore-taken');
+  controls=R('原有數量','n',d.n,0,10)+R('想拿走幾個','take',d.take,0,d.n)+B('拿走一個','take')+B('全部拿走','take-all')+B('放回全部','restore-taken');
   if(d.compare){scene=`<div class="p-two">${panel('第一群',dots(d.n,0))}${panel('第二群',dots(d.other,1))}</div>`;data=d.proof?`${d.n}−${d.other}＝${d.n-d.other}，比較的是多出的部分。`:'一一配對，指出不能配成一對的部分。';controls='';}
   else {scene=`<div class="p-dots">${Array.from({length:d.n},(_,i)=>B(`<span class="p-dot ${i<d.removed?'removed':''}" style="--dot:${colors[1]}"></span>`,'take',i,`aria-label="圓片${i+1}"`)).join('')}</div>`;data=d.proof?`原有${d.n}，拿走${d.removed}，剩${d.n-d.removed}；${d.n}−${d.removed}＝${d.n-d.removed}。`:`任務：拿走${d.take}個。先動手，不急著看算式。`;}
   break;}
@@ -46,6 +46,7 @@
  case 'bundle':case 'break10':{
   if(!d.prepared){d.loose=d.n;d.prepared=true;if(d.type==='break10'){d.bundles=Math.floor(d.n/10);d.loose=d.n%10;}}
   controls=B('十根捆一捆','bundle')+B('拆開一捆','unbundle')+(d.type==='break10'?B('拿走一根','remove-stick') : B('加一根','add-stick')+B('取走一根','remove-stick'));
+  if(d.type==='break10'&&s.phase!==5)controls+=B('換一道拆十題','break-next');
   scene=`<div class="p-two">${panel('每捆10根',`<div class="p-bundles">${Array.from({length:d.bundles},()=>'<div class="p-bundle">||||||||||<b>10</b></div>').join('')||'<span>暫無整捆</span>'}</div>`)}${panel('散棒',`<div class="p-sticks">${Array.from({length:d.loose},()=>'<i></i>').join('')}</div>`)}</div>`;
   data=d.proof?`${d.bundles}個十和${d.loose}個一，共${d.bundles*10+d.loose}根。${d.type==='break10'?`已取走${d.removed}根；可用加法把它們加回核對。`:''}`:d.type==='break10'?`任務：原有${d.n}根，要取走${d.take}根；散棒不夠時，想想怎樣拆。`:'捆與拆不改變總數；加一根或取走一根才會改變總數。';break;}
  case 'ordinal':{
@@ -55,6 +56,7 @@
  case 'make10':{
   if(d.moved===undefined)d.moved=0;const left=d.a+d.moved,right=d.b-d.moved;
   controls=B('移一個到第一盤','move-ten','',left>=10||right<=0?'disabled':'')+B('移回一個','undo-ten','',d.moved<=0?'disabled':'')+(d.sendTen?B('送出滿十的一盤','send-ten','',left!==10?'disabled':''):'');
+  if(!d.sendTen)controls+=B('換一組圓片','make-next');
   scene=`<div class="p-two">${panel(d.sent?'第一盤已送出':'第一盤',frame(d.sent?0:left,10,false,0))}${panel('第二盤',frame(right,10,false,1))}</div>`;
   data=d.proof?`${d.a}＋${d.b}＝${d.a+d.b}；移了${d.moved}個，成為${left}和${right}。${d.sent?`送出10個後剩${right}。`:''}`:'每次只搬一個，先觀察哪一盤能湊滿十。';break;}
  case 'path':{
@@ -67,7 +69,7 @@
   data=d.proof?`中心${d.n}：左${ne.left??'無格'}、右${ne.right??'無格'}、上${ne.up??'無格'}、下${ne.down??'無格'}。`:'看一看數字的十位與個位怎樣改變。表邊不能跨到另一行。';break;}
  case 'clock':controls=R('慢慢撥動長針','minutes',d.minutes,0,720,5)+B('再走半小時','clock-add',30)+B('再走一小時','clock-add',60)+B('回到3時整','clock-set',180);scene=handClock(d.minutes);data=d.proof?`時刻 ${ftime(d.minutes)}。長針走30分鐘，短針走半格；長針一圈60分鐘，短針走一大格。`:'先看長針，再看短針在兩個數字之間的哪裡；圖上的針會聯動。';break;
  case 'timeline':{
-  controls=B('前進半小時','progress',30)+B('退回半小時','progress',-30);const total=d.end-d.start;d.progress=Math.max(0,Math.min(total,d.progress));const count=Math.ceil(total/30);
+  controls=B('前進半小時','progress',30)+B('退回半小時','progress',-30)+(s.phase!==5?B('換個活動時段','timeline-next'):'');const total=d.end-d.start;d.progress=Math.max(0,Math.min(total,d.progress));const count=Math.ceil(total/30);
   scene=handClock(d.start+d.progress)+`<div class="p-timeline">${Array.from({length:count+1},(_,i)=>`<span class="${i*30<=d.progress?'visited':''}">${ftime(d.start+i*30)}</span>`).join('')}</div>`;
   data=d.proof?`由${ftime(d.start)}到${ftime(d.end)}，共${total}分鐘（${Math.floor(total/60)}小時${total%60}分鐘）。現在已走${d.progress}分鐘。`:'每個半小時段都要數，不能只減鐘面的兩個小時數。';break;}
  case 'calendar':{
@@ -75,17 +77,19 @@
   if(d.cycle){controls=B('走一天','cycle',1)+B('走七天','cycle',7)+B('重新走','cycle-reset');scene=`<div class="p-weekcycle">${days.map((n,i)=>`<div class="${i===((d.day-1+d.progress)%7)?'picked':''}">星期${n}</div>`).join('')}</div>`;data=d.proof?`由星期${days[d.day-1]}出發，已走${d.progress}天；現在是星期${days[(d.day-1+d.progress)%7]}。`:`任務：走${d.jump}天，注意7天一圈。`;}
   else{controls=B('前一週','calendar',-7,d.day-7<3?'disabled':'')+B('後一週','calendar',7,d.day+7>23?'disabled':'');scene=`<p>練習月曆：某月3日是星期一，並非今年真實月份。</p><div class="p-calendar">${days.map(n=>`<b>${n}</b>`).join('')}${Array.from({length:21},(_,i)=>B(i+3,'day',i+3,`class="${i+3===d.day?'picked':''}"`)).join('')}</div>`;data=d.proof?`${d.day}日是星期${days[M.weekday(d.day)]}。同一列每隔7天，星期相同。`:'點一個日期，再按前／後一週；到邊界請換一個日期。';}break;}
  case 'columns':{
-  controls=B('合併整十與散數','combine')+B('重新分開','uncombine');const ns=d.numbers;
+  controls=B('合併整十與散數','combine')+B('重新分開','uncombine')+(s.phase!==5?B('換一道整十散數題','columns-next'):'');const ns=d.numbers;
   scene=`<div class="p-columns">${(d.combined?[ns.reduce((a,b)=>a+b,0)]:ns).map(n=>panel(`${d.combined?'合起來':'一群'}：${n}`,`<div class="p-place"><div>${Array.from({length:Math.floor(n/10)},()=>'<div class="p-bundle">||||||||||<b>10</b></div>').join('')}</div><div>${dots(n%10,1)}</div></div>`)).join('')}</div>`;
   data=d.proof?`${ns.join('＋')}＝${ns.reduce((a,b)=>a+b,0)}。先合十，再合一；十位與十位對齊。`:'先估範圍，再用捆和散棒核對。';break;}
  case 'reverse':{
-  controls=d.mode==='share'?R('由哥哥移給弟弟','x',d.x,0,6):B(d.mode==='restore'?'把送出的加回去':'一端對齊比較','reverse-check');
+  controls=d.mode==='share'?R('由哥哥移給弟弟','x',d.x,0,6):B(d.mode==='restore'?'把送出的加回去':d.mode==='takeaway'?'核對剩下多少':'一端對齊比較','reverse-check');
+  if(d.mode!=='share')controls+=B('換一種已知與未知','reverse-next');
   const a=d.mode==='restore'?(d.restored?d.a+d.b:d.a):d.a-d.x,b=d.mode==='share'?d.b+d.x:d.b;
-  scene=d.mode==='difference'?svg(`${[a,b].map((count,row)=>Array.from({length:count},(_,i)=>`<rect x="${60+i*12}" y="${65+row*95}" width="11" height="42" fill="${row?'#228b7a':i<b?'#eaa56b':'#c75039'}" stroke="#fff"/>`).join('')).join('')}<line x1="60" y1="40" x2="60" y2="230" stroke="#6d8294" stroke-dasharray="6 5"/>${tx(320,270,'相同單位、起點對齊，指出多出的部分',18)}`):`<div class="p-two">${panel(d.mode==='restore'?'剩下／還原':'第一方',dots(a,0))}${panel(d.mode==='restore'?'送出過的':'第二方',dots(b,1))}</div>`;
-  data=d.proof?(d.mode==='restore'?`剩${d.a}，送出${d.b}；原有${d.a+d.b}，再用${d.a+d.b}−${d.b}＝${d.a}查。`:d.mode==='share'?`哥哥${a}、弟弟${b}，相差${Math.abs(a-b)}。給1支，一邊少1、另一邊多1。`:`${d.a}−${d.b}＝${d.a-d.b}。`):'先辨認要找的是「相差」「剩下」還是「原有」，不要只找關鍵字。';break;}
+  scene=d.mode==='difference'?svg(`${[a,b].map((count,row)=>Array.from({length:count},(_,i)=>`<rect x="${60+i*12}" y="${65+row*95}" width="11" height="42" fill="${row?'#228b7a':i<b?'#eaa56b':'#c75039'}" stroke="#fff"/>`).join('')).join('')}<line x1="60" y1="40" x2="60" y2="230" stroke="#6d8294" stroke-dasharray="6 5"/>${tx(320,270,'相同單位、起點對齊，指出多出的部分',18)}`):`<div class="p-two">${panel(d.mode==='restore'?(d.restored?'送出前原有':'送出後剩下'):d.mode==='takeaway'?'原有':'第一方',dots(a,0))}${panel(d.mode==='restore'?'送出過的':d.mode==='takeaway'?'拿走':'第二方',dots(b,1))}</div>`;
+  data=d.proof?(d.mode==='restore'?`剩${d.a}，送出${d.b}；原有${d.a+d.b}，再用${d.a+d.b}−${d.b}＝${d.a}查。`:d.mode==='share'?`哥哥${a}、弟弟${b}，相差${Math.abs(a-b)}。給1支，一邊少1、另一邊多1。`:d.mode==='takeaway'?`原有${d.a}、拿走${d.b}，剩${d.a-d.b}；${d.a}−${d.b}＝${d.a-d.b}。`:`${d.a}−${d.b}＝${d.a-d.b}。`):'先辨認要找的是「相差」「剩下」還是「原有」，不要只找關鍵字。';break;}
  case 'coins':case 'shop':{
   if(d.budget){controls=d.items.map((v,i)=>B(`買${i?'牛奶':'麵包'} ${v/10}圓`,'basket',i)).join('')+B('清空購物籃','clear-coins');const total=d.coins.reduce((a,b)=>a+b,0);scene=`<div class="p-shop"><h3>預算 ${d.budget/10} 圓</h3>${d.coins.map(v=>`<span class="p-coin">${v/10}圓商品</span>`).join('')||'<p>先討論要買甚麼，再加入購物籃。</p>'}</div>`;data=d.proof?`已選${total/10}圓。${total<=d.budget?`還剩${(d.budget-total)/10}圓。`:`超出${(total-d.budget)/10}圓，需要調整選擇。`}`:'先估夠不夠錢，再用金額核對。';break;}
   const vals=d.type==='shop'||d.wholeOnly?[10,20,50]:[1,5,10,20,50,100];controls=vals.map(v=>B(`${v<10?v:v/10}${v<10?'毫':'圓'}`,'coin',v)).join('')+B('拿回最後一枚','coin-undo')+B('重新配錢','clear-coins')+(d.type==='shop'?B('改付10圓','pay-ten'):'');
+  if(d.type==='coins'&&!d.wholeOnly)controls+=[10,50,100].map(v=>B(`改湊${v/10}圓`,'coin-target',v)).join('');
   const total=d.coins.reduce((a,b)=>a+b,0),goal=d.type==='shop'?d.price:d.target;scene=`<div class="p-shop"><h3>${d.type==='shop'?'商品價格':'要湊的金額'} ${goal%10?goal+'毫':goal/10+'圓'}</h3><div class="p-money">${d.coins.map(v=>`<span class="p-coin">${v<10?v:v/10}<small>${v<10?'毫':'圓'}</small></span>`).join('')||'<p>點上方的面值卡，擺出你的付法。</p>'}</div></div>`;
   data=d.proof?`共${total}毫＝${Math.floor(total/10)}圓${total%10}毫，${d.coins.length}枚。${total===goal?'剛好一樣多。':total>goal?`多${total-goal}毫${d.type==='shop'?'要找續':''}。`:`還差${goal-total}毫。`}${d.type==='shop'?`只用1、2、5圓剛好付${goal/10}圓，最少${M.minCoins(goal/10)}枚。`:''}`:'先比較錢的面值與單位，不用枚數代替總額。';note='使用面值教學卡，不仿製真實硬幣；本課1圓＝10毫，金額均以整數毫運算。';break;}
  case 'units':{
@@ -126,7 +130,7 @@
  function bind(host,s){const root=host.querySelector('[data-primary]');if(!root)return;let d=memory.get(s.id);if(!d){d=initial(s.app);memory.set(s.id,d);}let timer=null;
   root.innerHTML='<div class="p-controls"></div><div class="p-scene"></div><div class="p-readout" aria-live="polite"></div><p class="p-note"></p><div class="p-check"></div>';
   function draw(full=true){const v=view(d,s);if(full)root.querySelector('.p-controls').innerHTML=v.controls;root.querySelector('.p-scene').innerHTML=v.scene;root.querySelector('.p-readout').textContent=v.data;root.querySelector('.p-note').textContent=v.note;root.querySelector('.p-check').innerHTML=B(d.proof?'收起核對':'看看數據與核對','proof')+B('重設這個教具','reset');root.querySelectorAll('[data-label]').forEach(e=>e.textContent=e.dataset.label==='minutes'?'慢慢撥動':d[e.dataset.label]);}
-  root.oninput=e=>{const key=e.target.dataset.param;if(!key)return;d[key]=Number(e.target.value);if(key==='n'){d.left=Math.min(d.left,d.n);d.pick=Math.min(d.pick,d.n);}draw(false);const pick=root.querySelector('[data-param=pick]');if(pick){pick.max=d.n;pick.value=d.pick;}};
+  root.oninput=e=>{const key=e.target.dataset.param;if(!key)return;d[key]=Number(e.target.value);if(key==='n'){d.left=Math.min(d.left,d.n);d.pick=Math.min(d.pick,d.n);d.removed=Math.min(d.removed,d.n);d.take=Math.min(d.take,d.n);}draw(false);const pick=root.querySelector('[data-param=pick]');if(pick){pick.max=d.n;pick.value=d.pick;}const take=root.querySelector('[data-param=take]');if(take){take.max=d.n;take.value=d.take;}};
   root.onclick=e=>{const b=e.target.closest('[data-op]');if(!b||!root.contains(b))return;const op=b.dataset.op,a=b.dataset.arg,n=Number(a);
    switch(op){
     case 'proof':d.proof=!d.proof;break;case 'reset':d=initial(s.app);memory.set(s.id,d);break;
@@ -137,6 +141,12 @@
     case 'swap-add':[d.a,d.b]=[d.b,d.a];break;case 'take':d.removed=Math.min(d.n,d.removed+1);break;case 'take-all':d.removed=d.n;break;case 'restore-taken':d.removed=0;break;
     case 'x-plus':d.x=Math.min(12,d.x+1);break;case 'x-minus':d.x=Math.max(0,d.x-1);break;case 'balance-next':[d.a,d.target]=d.a===4?[6,10]:[4,9];d.x=0;break;
     case 'shape':d.shape=a;d.angle=0;break;case 'rotate-solid':d.angle=d.angle?0:90;break;case 'push':d.push=!d.push;break;
+    case 'break-next':{const list=[[13,8],[15,9],[12,7]],next=(list.findIndex(p=>p[0]===d.n)+1)%list.length;[d.n,d.take]=list[next];d.prepared=false;d.removed=0;break;}
+    case 'make-next':{const list=[[8,5],[9,4],[7,6]],next=(list.findIndex(p=>p[0]===d.a&&p[1]===d.b)+1)%list.length;[d.a,d.b]=list[next];d.moved=0;d.sent=false;break;}
+    case 'timeline-next':{const list=[[540,630],[120,150],[600,660],[210,270]],next=(list.findIndex(p=>p[0]===d.start&&p[1]===d.end)+1)%list.length;[d.start,d.end]=list[next];d.progress=0;break;}
+    case 'columns-next':{const list=[[23,14],[32,25],[40,18]],next=(list.findIndex(p=>p.join()===d.numbers.join())+1)%list.length;d.numbers=list[next].slice();d.combined=false;break;}
+    case 'reverse-next':{const list=[{a:38,b:15,mode:'difference'},{a:12,b:5,mode:'restore'},{a:45,b:12,mode:'takeaway'}],next=(list.findIndex(p=>p.mode===d.mode)+1)%list.length;Object.assign(d,list[next]);d.restored=false;d.x=0;break;}
+    case 'coin-target':d.target=n;d.coins=[];break;
     case 'bundle':if(d.loose>=10){d.loose-=10;d.bundles++;}break;case 'unbundle':if(d.bundles){d.bundles--;d.loose+=10;}break;
     case 'add-stick':if(d.loose+d.bundles*10<30)d.loose++;break;case 'remove-stick':if(d.loose>0){d.loose--;d.removed++;}break;
     case 'reverse':d.reverse=!d.reverse;break;case 'prefix':d.prefix=!d.prefix;break;case 'pick':d.pick=n;break;
