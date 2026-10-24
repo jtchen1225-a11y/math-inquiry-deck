@@ -25,12 +25,14 @@ window.DECK = [{
 }];
 ```
 
-每頁必要欄位為 id、kind、phase、sec、secName、title、prompt。phase 為 0–4。探究模式不插入章名分隔頁。保留 ch 與 sections，以沿用原版目錄結構。id 在整份課程中必須唯一。
+每頁必要欄位為 id、kind、phase、sec、secName、title、prompt。phase 為0至phases.length−1；支援2至8階段，小一六步使用0至5。探究模式不插入章名分隔頁。保留 ch 與 sections，以沿用原版目錄結構。id 在整份課程中必須唯一。
 
 ## 頁型
 
 | kind | 功能 | 適用範圍 |
 | --- | --- | --- |
+| primary | 小一數學教具；app 指定類型與初始值 | 小一30週 |
+| p1-talk | 短句說理與反例追問 | 小一 |
 | question | 小組選擇猜想，理由寫在工作紙，可提供 choices | 通用 |
 | task | 任務文字與紙本提示 | 通用 |
 | practice / rule | 紙本提示與分段揭示 | 通用 |
@@ -74,3 +76,7 @@ inquiry.css 只覆寫 `.inquiry-mode` 或探究專用類別，不改 review 頁�
 原引擎深連結 `#p=N` 使用從 0 開始的索引：`#p=2` 是第 3 頁；`#present` 直接進入第一頁。
 
 提示與答案皆在前端，不作保密。原始教學素材與學生匯出資料不得預設納入公開 Repo。
+
+## 小一共用資產課程
+
+`python scripts/build_primary.py` 從 lessons/primary/lessons.json 產生 primary/week01 至 week30。各課只有 index.html 與 ch1.js，引用 ../../assets；驗證器會依HTML檢查共用資產。載入 primary-model.js、primary.js、primary.css 後，`kind: primary` 使用 `app.type` 選擇教具。`ageBand: p1` 顯示適齡輪流操作提示。原果汁課的五步設定與雙模式產生器維持相容。

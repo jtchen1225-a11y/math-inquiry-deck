@@ -132,8 +132,16 @@ const chFiles = fs.readdirSync(dir).filter((f) => /^ch\d+\.js$/.test(f))
 
 if (!chFiles.length) err('資料夾內找不到任何 chN.js');
 
+function assetExists(name) {
+  if (fs.existsSync(path.join(dir,name))) return true;
+  const index = path.join(dir,'index.html');
+  if (!fs.existsSync(index)) return false;
+  const source = fs.readFileSync(index,'utf8');
+  const urls = [...source.matchAll(/(?:src|href)="([^"]+)"/g)].map(m => m[1].split('?')[0]);
+  return urls.some(u => !/^https?:/.test(u) && path.basename(u) === name && fs.existsSync(path.resolve(dir,u)));
+}
 for (const f of ['engine.js', 'style.css', 'svg.js', 'index.html']) {
-  if (!fs.existsSync(path.join(dir, f))) err(`缺少必要檔案 ${f}`);
+  if (!assetExists(f)) err(`缺少必要檔案 ${f}`);
 }
 
 const sandbox = { window: {}, SV: SVstub, MJ: () => {}, console, Math, Date, JSON, String, Number, Array, Object };
@@ -164,9 +172,10 @@ const inquiryMode = sandbox.window.DECK_CONFIG && sandbox.window.DECK_CONFIG.mod
 const inquiryIds = new Set();
 if (inquiryMode) {
   const config = sandbox.window.DECK_CONFIG;
+  if (config.ageBand === 'p1') for (const f of ['primary.js','primary-model.js','primary.css']) if (!assetExists(f)) err('小一課程缺少 ' + f);
   if (!config.id || !Number.isInteger(config.version) || config.version < 1) err('探究設定須有 id 及正整數 version');
-  if (!Array.isArray(config.phases) || config.phases.length !== 5) err('探究設定須有五階段 phases');
-  for (const f of ['inquiry.js', 'inquiry-model.js', 'inquiry.css']) if (!fs.existsSync(path.join(dir, f))) err('探究模式缺少 ' + f);
+  if (!Array.isArray(config.phases) || config.phases.length < 2 || config.phases.length > 8) err('探究設定須有2至8個階段 phases');
+  for (const f of ['inquiry.js', 'inquiry-model.js', 'inquiry.css']) if (!assetExists(f)) err('探究模式缺少 ' + f);
 }
 if (!DECK.length) err('window.DECK 是空的——章節檔沒有成功 push');
 
@@ -198,12 +207,12 @@ DECK.forEach((chap, ci) => {
     if (inquiryMode) {
       if (inquiryIds.has(s.id)) err(`${tag}：重複 id ${s.id}`);
       inquiryIds.add(s.id);
-      const kinds = ['question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
+      const kinds = ['primary','p1-talk','question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
       if (!kinds.includes(s.kind)) err(`${tag}：未知 kind ${s.kind}`);
       const themes = ['citrus','ocean','lime','coral','violet','berry','teal'];
       if (s.theme && typeof s.theme === 'string' && !themes.includes(s.theme)) err(`${tag}：未知 theme ${s.theme}`);
       if (s.theme && typeof s.theme === 'object' && Object.values(s.theme).some(v => !/^#[0-9a-f]{6}$/i.test(v))) err(`${tag}：自訂 theme 須使用六位色碼`);
-      if (!Number.isInteger(s.phase) || s.phase < 0 || s.phase > 4) err(`${tag}：phase 須為 0 至 4`);
+      if (!Number.isInteger(s.phase) || s.phase < 0 || s.phase >= sandbox.window.DECK_CONFIG.phases.length) err(`${tag}：phase 超出課程階段範圍`);
       if (s.reveals && (!Array.isArray(s.reveals) || s.reveals.some(t => typeof t !== 'string'))) err(`${tag}：reveals 須為字串陣列`);
       if (s.kind === 'question' && s.choices && (!Array.isArray(s.choices) || s.choices.length < 2)) err(`${tag}：choices 至少兩項`);
       forbidArg.forEach(w => { if (JSON.stringify(s).includes(w)) err(`${tag}：出現禁用詞「${w}」`); });

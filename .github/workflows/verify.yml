@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/model.test.cjs tests/schema.test.cjs
+      - run: node --test tests/model.test.cjs tests/schema.test.cjs tests/primary.test.cjs
       - run: python tests/generator_test.py
       - run: npm install --no-save --package-lock=false playwright@1.62.1
       - run: npx playwright install --with-deps chromium webkit
@@ -24,7 +24,9 @@ jobs:
           trap 'kill "$server_pid"' EXIT
           python -c "import urllib.request,time; time.sleep(1); urllib.request.urlopen('http://127.0.0.1:8890/demo/juice/', timeout=10)"
           node tests/browser.cjs
+          node tests/primary-browser.cjs
           TEST_ENGINE=webkit node tests/browser.cjs
+          TEST_ENGINE=webkit node tests/primary-browser.cjs
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: verify
@@ -47,6 +49,9 @@ jobs:
           mkdir -p _site/demo
           cp index.html _site/index.html
           cp -R demo/juice _site/demo/juice
+          cp -R primary _site/primary
+          mkdir -p _site/assets
+          cp assets/*.js assets/*.css _site/assets/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

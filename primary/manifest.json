@@ -1,0 +1,302 @@
+[
+  {
+    "week": 1,
+    "title": "空間方位與視角推理",
+    "source": "第01週_空間方位與視角推理_課堂探究單.docx",
+    "url": "week01/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "space",
+    "domain": "空間與圖形"
+  },
+  {
+    "week": 2,
+    "title": "長短高矮與直接比較",
+    "source": "第02週_長短高矮與直接比較_課堂探究單.docx",
+    "url": "week02/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "length",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 3,
+    "title": "十格陣 (Ten-Frame) 與數感結構",
+    "source": "第03週_十格陣_(Ten-Frame)_與數感結構_課堂探究單.docx",
+    "url": "week03/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "frame",
+    "domain": "數與運算"
+  },
+  {
+    "week": 4,
+    "title": "跳數節奏與單雙數推理",
+    "source": "第04週_跳數節奏與單雙數推理_課堂探究單.docx",
+    "url": "week04/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "pairs",
+    "domain": "數與運算"
+  },
+  {
+    "week": 5,
+    "title": "數的分與合",
+    "source": "第05週_數的分與合_課堂探究單.docx",
+    "url": "week05/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "split",
+    "domain": "數與運算"
+  },
+  {
+    "week": 6,
+    "title": "加法本質與情境建模",
+    "source": "第06週_加法本質與情境建模_課堂探究單.docx",
+    "url": "week06/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "add",
+    "domain": "數與運算"
+  },
+  {
+    "week": 7,
+    "title": "減法多重意義",
+    "source": "第07週_減法多重意義_課堂探究單.docx",
+    "url": "week07/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "subtract",
+    "domain": "數與運算"
+  },
+  {
+    "week": 8,
+    "title": "等式平衡與神秘未知數",
+    "source": "第08週_等式平衡與神秘未知數_課堂探究單.docx",
+    "url": "week08/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "balance",
+    "domain": "數與運算"
+  },
+  {
+    "week": 9,
+    "title": "立體積木特工隊",
+    "source": "第09週_立體積木特工隊_課堂探究單.docx",
+    "url": "week09/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "solid",
+    "domain": "空間與圖形"
+  },
+  {
+    "week": 10,
+    "title": "十個一是一十",
+    "source": "第10週_十個一是一十_課堂探究單.docx",
+    "url": "week10/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "bundle",
+    "domain": "數與運算"
+  },
+  {
+    "week": 11,
+    "title": "十加幾與十幾的分合",
+    "source": "第11週_十加幾與十幾的分合_課堂探究單.docx",
+    "url": "week11/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "bundle",
+    "domain": "數與運算"
+  },
+  {
+    "week": 12,
+    "title": "基數與序數大偵探",
+    "source": "第12週_基數與序數大偵探_課堂探究單.docx",
+    "url": "week12/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "ordinal",
+    "domain": "數與運算"
+  },
+  {
+    "week": 13,
+    "title": "湊十法進位算理",
+    "source": "第13週_湊十法進位算理_課堂探究單.docx",
+    "url": "week13/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "make10",
+    "domain": "數與運算"
+  },
+  {
+    "week": 14,
+    "title": "破十法與想加算減",
+    "source": "第14週_破十法與想加算減_課堂探究單.docx",
+    "url": "week14/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "break10",
+    "domain": "數與運算"
+  },
+  {
+    "week": 15,
+    "title": "線條路徑與封閉迷宮",
+    "source": "第15週_線條路徑與封閉迷宮_課堂探究單.docx",
+    "url": "week15/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "path",
+    "domain": "空間與圖形"
+  },
+  {
+    "week": 16,
+    "title": "個位與十位",
+    "source": "第16週_個位與十位_課堂探究單.docx",
+    "url": "week16/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "hundred",
+    "domain": "數與運算"
+  },
+  {
+    "week": 17,
+    "title": "跳數節奏與快速估算",
+    "source": "第17週_跳數節奏與快速估算_課堂探究單.docx",
+    "url": "week17/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "group",
+    "domain": "數與運算"
+  },
+  {
+    "week": 18,
+    "title": "鐘面上的長針與短針",
+    "source": "第18週_鐘面上的長針與短針_課堂探究單.docx",
+    "url": "week18/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "clock",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 19,
+    "title": "時間流逝與作息推理",
+    "source": "第19週_時間流逝與作息推理_課堂探究單.docx",
+    "url": "week19/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "timeline",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 20,
+    "title": "月曆中的週期密碼",
+    "source": "第20週_月曆中的週期密碼_課堂探究單.docx",
+    "url": "week20/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "calendar",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 21,
+    "title": "整十數與散數組合",
+    "source": "第21週_整十數與散數組合_課堂探究單.docx",
+    "url": "week21/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "columns",
+    "domain": "數與運算"
+  },
+  {
+    "week": 22,
+    "title": "減法比多比少與逆向推理",
+    "source": "第22週_減法比多比少與逆向推理_課堂探究單.docx",
+    "url": "week22/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "reverse",
+    "domain": "數與運算"
+  },
+  {
+    "week": 23,
+    "title": "認識澳門通用的硬幣",
+    "source": "第23週_認識澳門通用的硬幣_課堂探究單.docx",
+    "url": "week23/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "coins",
+    "domain": "生活與數據"
+  },
+  {
+    "week": 24,
+    "title": "生活中的購物決策",
+    "source": "第24週_生活中的購物決策_課堂探究單.docx",
+    "url": "week24/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "shop",
+    "domain": "生活與數據"
+  },
+  {
+    "week": 25,
+    "title": "使用公認單位的需要",
+    "source": "第25週_使用公認單位的需要_課堂探究單.docx",
+    "url": "week25/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "units",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 26,
+    "title": "斷尺量度與曲線測量",
+    "source": "第26週_斷尺量度與曲線測量_課堂探究單.docx",
+    "url": "week26/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "ruler",
+    "domain": "量度與時間"
+  },
+  {
+    "week": 27,
+    "title": "平面圖形放大鏡",
+    "source": "第27週_平面圖形放大鏡_課堂探究單.docx",
+    "url": "week27/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "shape",
+    "domain": "空間與圖形"
+  },
+  {
+    "week": 28,
+    "title": "七巧板的魔術變形",
+    "source": "第28週_七巧板的魔術變形_課堂探究單.docx",
+    "url": "week28/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "tangram",
+    "domain": "空間與圖形"
+  },
+  {
+    "week": 29,
+    "title": "象形統計圖與分類大整理",
+    "source": "第29週_象形統計圖與分類大整理_課堂探究單.docx",
+    "url": "week29/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "stats",
+    "domain": "生活與數據"
+  },
+  {
+    "week": 30,
+    "title": "四宮格圖形數獨與綜合排除法",
+    "source": "第30週_四宮格圖形數獨與綜合排除法_課堂探究單.docx",
+    "url": "week30/",
+    "pages": 10,
+    "phases": 6,
+    "activity": "sudoku",
+    "domain": "空間與圖形"
+  }
+]

@@ -6,6 +6,8 @@
 
 ## 線上使用
 
+**[小一30週六步探究課程](https://jtchen1225-a11y.github.io/math-inquiry-deck/primary/)**：每份工作紙各有一份獨立互動簡報，共30份、300頁。保留六步、原來兩道練習與生活應用，教具包括十格陣、分合盤、平衡、聯動教學鐘、月曆、硬幣、購物、量尺、七巧板、統計及數獨。詳細對照見 [小一教師指南](references/primary-guide.md)。
+
 **[開啟果汁探究課](https://jtchen1225-a11y.github.io/math-inquiry-deck/demo/juice/)** · [網站入口](https://jtchen1225-a11y.github.io/math-inquiry-deck/)
 
 小組用同一部 iPad 操作，學生各自在對應工作紙填寫判斷、數據與論證。
@@ -69,6 +71,7 @@ python -m http.server 8890 --directory my-lesson
 
 ```powershell
 python scripts/build_demo.py
+python scripts/build_primary.py
 ```
 
 從完整課程 JS 建立新版本：
@@ -91,7 +94,7 @@ node scripts/verify_deck.js review
 ## 開發與驗證
 
 ```powershell
-node --test tests/model.test.cjs tests/schema.test.cjs
+node --test tests/model.test.cjs tests/schema.test.cjs tests/primary.test.cjs
 python tests/generator_test.py
 ```
 
@@ -102,9 +105,11 @@ npm install --no-save --package-lock=false playwright@1.62.1
 npx playwright install chromium webkit
 # 另一個終端先執行 python -m http.server 8890
 node tests/browser.cjs
+node tests/primary-browser.cjs
 # WebKit（接近 Safari 的引擎）
 $env:TEST_ENGINE="webkit"
 node tests/browser.cjs
+node tests/primary-browser.cjs
 ```
 
 測試預設連線 `http://127.0.0.1:8890`。可用 `BASE_URL`、`PLAYWRIGHT_MODULE`、`BROWSER_EXECUTABLE` 指定網址、套件與瀏覽器位置；`SCREENSHOT_DIR` 可輸出截圖。GitHub Actions 執行數學模型、結構、雙模式產生器、Chromium 與 WebKit 瀏覽器測試，再部署 Pages。
@@ -115,6 +120,8 @@ node tests/browser.cjs
 
 ```text
 assets/                  引擎、樣式、探究互動與數學模型
+lessons/primary/          30週課程原始定義
+primary/                 課程入口與30份獨立簡報（共用 assets）
 demo/juice/              可直接播放的完整示範課
 examples/juice-lesson.js  課程內容來源
 scripts/                 雙模式產生器、示範課重建、驗證器
@@ -136,6 +143,8 @@ SKILL.md                 AI 製作探究課的工作規則
 ## GitHub Pages 部署
 
 此 Repo 已設定 GitHub Pages。main 推送通過模型、產生器、Chromium 及 WebKit 測試後，自動發布入口與 `demo/juice/`。公開網站網址不依賴本機 localhost，學生可直接在 iPad 開啟。
+
+小一課程發布於 `primary/week01/` 至 `primary/week30/`；教師可分享單週網址。每週10頁、六階段，正式答案仍寫在原工作紙。新增或修改教具後須重建兩種示範課，讓共用資產版本一致。
 
 新 fork 如需 Pages，先到 Settings → Pages 選 GitHub Actions，並確認 Actions 可部署至 github-pages 環境。部署流程只打包入口與示範課，不把原始 Word、測試或課堂草稿放入網站。
 

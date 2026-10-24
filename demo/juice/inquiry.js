@@ -19,7 +19,7 @@
     berry: {accent:'#a03779',soft:'#fbe1ef',wash:'#fff4fa',ink:'#672c50',secondary:'#46792c'},
     teal: {accent:'#08786f',soft:'#d7f4e9',wash:'#effbf6',ink:'#15534d',secondary:'#ab580a'}
   };
-  const phaseThemes = ['citrus','ocean','teal','violet','coral'];
+  const phaseThemes = ['citrus','ocean','teal','violet','coral','lime'];
   function palette(s) {
     const base = themes[typeof s.theme === 'string' ? s.theme : phaseThemes[s.phase]] || themes.citrus;
     const colors = {...base};
@@ -74,7 +74,9 @@
   }
   function activity(s) {
     switch(s.kind) {
-      case 'question': return `${s.labels?labels():''}<fieldset class="choices"><legend>小組先選一個猜想</legend>${(s.choices||['我同意','我不同意','需要更多證據']).map(t=>`<label><input type="radio" name="prediction" value="${esc(t)}" data-choice="${s.id}" ${state.choices[s.id]===t?'checked':''}>${esc(t)}</label>`).join('')}</fieldset>${paper('把最初判斷與理由寫在工作紙，稍後用實驗證據檢查。')}`;
+      case 'primary': return window.Primary.view(s);
+      case 'p1-talk': return '<div class="reflection-grid">' + ['我發現甚麼？','我的圖或實物在哪裡？','換一個例子還成立嗎？'].map(t=>'<section><b>'+t+'</b><p>指一指、擺一擺，或說給同伴聽。</p></section>').join('') + '</div>' + paper('可畫圖、圈畫或口述，不用抄寫長句。') + reveal(s);
+      case 'question': return `${s.context?'<div class="primary-context"><span>'+esc(s.context.icon)+'</span><b>'+esc(s.context.label)+'</b></div>':''}${s.labels?labels():''}<fieldset class="choices"><legend>小組先選一個猜想</legend>${(s.choices||['我同意','我不同意','需要更多證據']).map(t=>`<label><input type="radio" name="prediction" value="${esc(t)}" data-choice="${s.id}" ${state.choices[s.id]===t?'checked':''}>${esc(t)}</label>`).join('')}</fieldset>${paper('把最初判斷與理由寫在工作紙，稍後用實驗證據檢查。')}`;
       case 'annotation': return `<div class="mode-buttons">${button('標註基準量','mark-base','aria-pressed="true"')}${button('標註核心變數','mark-variable','aria-pressed="false"')}</div><div class="annotation-line"><span data-mark="base">1 份濃縮果汁</span><b> : </b><span data-mark="variable">4 份清水</span></div><p>先選標註工具，再點選文字；也可直接在工作紙圈畫。</p>${paper('解釋 1:4 的兩個量，並說明整杯總量應如何計算。')}`;
       case 'lab': return `<div class="lab-toolbar"><div class="mode-buttons">${button('固定果汁＝1','fixed',`aria-pressed="${state.mode==='fixed'}"`)}${button('自由調配','free',`aria-pressed="${state.mode==='free'}"`)}${button('恢復標籤配方','restore')}</div><div class="mode-buttons">${['parts','ratio','concentration'].map((v,i)=>button(['只看份數','比值換算','整體濃度 %'][i],'view',`data-view="${v}" aria-pressed="${state.view===v}"`)).join('')}</div></div><div class="cups-grid">${cupsHTML()}</div><p class="model-note">相同刻度：15 份。液面表示總量；顏色只作濃度示意。清水為 0 時，比值未定義，整體濃度為 100%。</p><div class="status" aria-live="polite"></div>${paper('由記錄員把配比、比值、總份數、濃度與顏色觀察填入工作紙。')}`;
       case 'representation': return `<div class="part-grid"><div class="juice-part">果汁<br>1 份</div>${Array.from({length:4},()=>'<div>清水<br>1 份</div>').join('')}</div><div class="mode-buttons">${button('看總份數','part-total')}${button('看比值','part-ratio')}${button('看整體濃度','part-concentration')}</div><div class="representation-output" aria-live="polite">先數一數，整杯有幾份？</div>${paper('向組員解釋：0.25 和 20% 的分母有甚麼不同？')}`;
@@ -120,7 +122,7 @@
   function render(h,s) {
     if(disposeSketch){disposeSketch();disposeSketch=null;}
     applyTheme(h,s);h.className='slide inquiry-slide';
-    h.innerHTML=`<div class="inquiry-page"><nav class="phase-strip" aria-label="探究流程">${(cfg.phases||[]).map((p,i)=>`<span class="phase-${i} ${i===s.phase?'active':''}" ${i===s.phase?'aria-current="step"':''}><b>${i+1}</b>${esc(p)}</span>`).join('')}</nav><header class="inquiry-heading"><p class="inquiry-eyebrow">課堂探究 <span>·</span> ${esc(s.secName||'')}</p><h2>${esc(s.title)}</h2><p>${esc(s.prompt||'')}</p></header><div class="worksheet-strip"><span>工作紙 ${esc(s.worksheet||'對應活動')}</span><small>操作員 · 觀察員 · 紙本記錄員 · 報告員</small></div><div class="activity">${activity(s)}</div>${s.hint?`<aside class="inquiry-hint">${esc(s.hint)}</aside>`:''}${scratchpad(s)}<footer class="inquiry-footer"><span>一組一部 iPad · 操作與討論在畫面，作答在工作紙</span>${button('重新開始本課','reset')}</footer></div>`;
+    h.innerHTML=`<div class="inquiry-page"><nav class="phase-strip" aria-label="探究流程">${(cfg.phases||[]).map((p,i)=>`<span class="phase-${i} ${i===s.phase?'active':''}" ${i===s.phase?'aria-current="step"':''}><b>${i+1}</b>${esc(p)}</span>`).join('')}</nav><header class="inquiry-heading"><p class="inquiry-eyebrow">課堂探究 <span>·</span> ${esc(s.secName||'')}</p><h2>${esc(s.title)}</h2><p>${esc(s.prompt||'')}</p></header><div class="worksheet-strip"><span>工作紙 ${esc(s.worksheet||'對應活動')}</span><small>${cfg.ageBand==='p1'?'輪流操作 · 指一指 · 說給同伴聽':'操作員 · 觀察員 · 紙本記錄員 · 報告員'}</small></div><div class="activity">${activity(s)}</div>${s.hint?`<aside class="inquiry-hint">${esc(s.hint)}</aside>`:''}${scratchpad(s)}<footer class="inquiry-footer"><span>一組一部 iPad · 操作與討論在畫面，作答在工作紙</span>${button('重新開始本課','reset')}</footer></div>`;
     const note=h.querySelector('[data-note]');if(note)note.oninput=()=>{state.notes[s.id]=note.value;};
     h.querySelectorAll('[data-choice]').forEach(el=>el.onchange=()=>{state.choices[el.dataset.choice]=el.value;});
     h.querySelectorAll('[data-evidence]').forEach(el=>el.onchange=()=>{state.selected=Array.from(h.querySelectorAll('[data-evidence]:checked')).map(e=>e.dataset.evidence);});
@@ -146,10 +148,12 @@
         case 'part-total':h.querySelector('.representation-output').textContent='1＋4＝5 份。整杯包含果汁與清水。';break;
         case 'part-ratio':h.querySelector('.representation-output').textContent='果汁 ÷ 清水＝1÷4＝0.25（部分比部分）。';break;
         case 'part-concentration':h.querySelector('.representation-output').textContent='果汁 ÷ 整杯＝1÷(1＋4)＝20%（部分比整體）。';break;
-        case 'reset':if(window.confirm('重新開始這一課？目前的操作、比較配方和臨時書寫會清空。')){state=fresh();render(h,s);}break;
+        case 'reset':if(window.confirm('重新開始這一課？目前的操作、比較配方和臨時書寫會清空。')){state=fresh();if(window.Primary)window.Primary.reset();render(h,s);}break;
       }
     });
-    disposeSketch=bindSketch(h,s);
+    const sketchCleanup=bindSketch(h,s);
+    const activityCleanup=window.Primary?window.Primary.bind(h,s):null;
+    disposeSketch=()=>{if(sketchCleanup)sketchCleanup();if(activityCleanup)activityCleanup();};
   }
   window.Inquiry={render,palette};
 })();
