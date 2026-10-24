@@ -57,6 +57,7 @@ const assert=require('node:assert/strict');
   for(const [width,height] of [[1024,768],[768,1024],[390,844]]){
     await page.setViewportSize({width,height});await go(2);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    assert.equal(await page.evaluate(()=>document.querySelector('.inquiry-slide').getBoundingClientRect().bottom<=document.querySelector('.dock').getBoundingClientRect().top),true,'教具列不應遮住探究內容');
     assert.equal(await page.locator('[data-action="compare"]').first().isVisible(),true);
     await page.locator('.scratchpad summary').click();await canvas.scrollIntoViewIfNeeded();
     const rect=await canvas.boundingBox();await page.touchscreen.tap(rect.x+25,rect.y+25);assert.equal(await hasInk(),true);
