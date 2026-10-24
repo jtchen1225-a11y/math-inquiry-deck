@@ -1,162 +1,125 @@
-# math-review-deck
+# math-inquiry-deck
 
-**互動視覺化複習簡報框架** — 一頁一重點、左邊講觀念、右邊看圖、拖滑桿就會動的網頁簡報。
-純前端、零建置、零 API 金鑰。
+以 **先判斷 → 動手調配 → 記錄數據 → 提出論證 → 應用遷移** 為主軸的課堂探究網頁簡報框架。
 
-這是一套已經在實際教學現場用過的框架：以此產出的六冊國中數學全冊複習簡報
-（**364 頁、約 169 頁互動**）目前正在給學生使用。
+從 [mathruffian-dot/math-review-deck](https://github.com/mathruffian-dot/math-review-deck) 延伸，保留原版複習模式、章節導覽、畫筆、雷射筆與全螢幕，新增問題導向頁型、分段提示、作答保存與實驗證據引用。內附 **小六數學「果汁濃度與比值的本質」12 頁示範課**。
 
----
+## 先試用示範課
 
-## 它產出什麼
+下載或 clone Repo，進入專案資料夾，執行：
 
-一份簡報就是一個資料夾，可以直接用瀏覽器開，或丟到任何靜態主機：
-
-```
-我的複習網站/
-├── index.html      # 骨架（封面／目錄／舞台／控制列／教具列）
-├── engine.js       # 導覽與渲染引擎        ← 共用，不用改
-├── style.css       # 全部樣式              ← 共用，不用改
-├── svg.js          # SV 幾何工具庫         ← 共用，不用改
-└── ch1.js ~ chN.js # 各章投影片內容        ← 只需要寫這個
+```powershell
+python -m http.server 8890
 ```
 
-每張投影片是左右兩欄：
+開啟 <http://localhost:8890>，按「進入果汁探究課」。也可直接開啟 <http://localhost:8890/demo/juice/>。
 
-| 左：概念欄 | 右：視覺欄 |
-|---|---|
-| 章節徽章、標題（這一頁的唯一重點）、公式卡、2~4 條要點、範例（可展開解答） | SVG 圖／公式卡／對照表，可加**滑桿**或**步驟滑桿** |
+示範課已收錄全部資產，**不必 npm install、不需 API key、不需建置**。探究模式不載入 CDN，啟動本機伺服器後可斷網使用。原版複習模式的數學排版仍使用 MathJax CDN。
 
-### 內建功能
+## 課堂操作
 
-- **一頁一螢幕自動縮放** — 內容過高會等比縮小，投影時整頁不必捲動
-- **授課教具列** — 雷射筆（含淡出拖尾）、畫筆（5 色＋橡皮擦）、清除筆跡、全螢幕
-- **放大成整頁** — 把範例或圖解攤成滿版方便在上面用畫筆講解；
-  HTML 內容會**連同字級一起等比放大**
-- **章節目錄** — 側欄可收合，手機版自動改為單欄
-- **深連結** — `#present` 直接進簡報、`#p=20` 直接跳頁
-- **MathJax 數學排版**（唯一的外部相依）
+| 頁 | 活動 | 操作 |
+| --- | --- | --- |
+| 1–2 | 先判斷與審題 | 比較三款標籤，記錄猜想；標註基準量與變數 |
+| 3–4 | 動手調配 | A/B/C/D 四杯並排；切換固定果汁、自由調配、比值與濃度 |
+| 5–7 | 記錄與歸納 | 實驗快照、等比例放大、分段提示與規律發現 |
+| 8 | 數學小法庭 | 引用快照，完成主張、證據、道理與反駁 |
+| 9–11 | 應用遷移 | 檸檬紅茶、25% 轉部分比部分、15 公升調配與瓶數 |
+| 12 | 反思與自評 | 回看最初判斷、離堂題、三項自我評估 |
 
----
+- 「記錄這杯」保存快照，後續拖動不會改寫舊配方。
+- 「需要提示」逐層揭示，開場不直接呈現結論。
+- 作答與操作保存在目前瀏覽器，跨頁與重新整理後保留。
+- 「匯出課堂紀錄」下載 JSON；「重設本課」確認後清除此課紀錄。
+- ← → 翻頁；輸入框、按鈕與滑桿保留原生按鍵操作。L 雷射筆、P 畫筆、C 清除筆跡。
+- 表單較長的探究頁允許頁內捲動，以保留可讀字級。手機使用底部教具列。
 
-## 快速開始
+### 數學模型
 
-### 1. 產生骨架
+標籤約定為 **濃縮果汁：清水**；各份等體積，混合體積按可相加計算。
 
-```bash
-python scripts/new_deck.py --out 我的複習網站 \
-    --title "國中數學 七上 全冊複習" \
-    --eyebrow "108 課綱國中數學 · 第 1 冊（七上）" \
-    --cover-title "七上全冊複習" \
-    --sub "整數的運算 · 分數的運算 · 一元一次方程式" \
-    --home "七上複習" \
-    --chapters "整數的運算::1-1 負數與數線,1-2 整數的加減" \
-               "分數的運算::2-1 因數與倍數,2-2 最大公因數"
+```text
+比值       = 果汁份數 ÷ 清水份數
+整體濃度   = 果汁份數 ÷ (果汁份數 + 清水份數)
 ```
 
-`--chapters` 格式為 `章名:色碼:節1,節2`；色碼留空會自動套用內建配色。
+1:4 的比值為 0.25，整體濃度為 20%。清水為 0 時，比值未定義，濃度為 100%。液面表示總量；顏色只作示意，並非實際飲品色度量測。25% 對應果汁：清水＝1:3。15,000 mL、1:4 需要果汁 3,000 mL、水 12,000 mL；800 mL 一瓶至少買 4 瓶。
 
-### 2. 寫內容
+## 製作其他探究課
 
-編輯 `chN.js`。格式規格見 [`references/slide-spec.md`](references/slide-spec.md)，
-完整範例見 [`examples/ch-example.js`](examples/ch-example.js)（示範五種頁型）。
+需要 Python 3.9+；驗證需要 Node.js 18+。
 
-```js
-{
-  sec: '1-2', secName: '整數的加減',
-  title: '同號相加照抄符號，異號相加取「大的」符號',
-  points: ['…', '…', '…'],
-  formula: { label: '交換律', tex: 'a+b=b+a' },
-  visual: (h) => { /* 畫圖或做互動 */ },
-  caption: '圖下方一行說明。',
-  example: { q: '…', steps: ['…', '…'], ans: '…' }
-}
+```powershell
+python scripts/new_deck.py --mode inquiry --out my-lesson --title "我的數學探究課" --chapters "生活中的比::1-1 情境探究"
+node scripts/verify_deck.js my-lesson
+python -m http.server 8890 --directory my-lesson
 ```
 
-### 3. 驗證
+每節產生五階段骨架。編輯輸出中的 `ch1.js`，替換問題、任務及提示。一般 `question`、`task`、`argument` 頁型可跨主題；果汁實驗等專用頁型需依新課題修改。見 [探究模式規格](references/inquiry-spec.md)。
 
-```bash
-node scripts/verify_deck.js 我的複習網站
+重新產生內附果汁示範課：
+
+```powershell
+python scripts/build_demo.py
 ```
 
-**不需要瀏覽器。** 它會把每張投影片的 `visual()` 實際執行一遍，並
-**掃過每個滑桿的每一個值**，因此能抓出「只有拖到某個值才會爆」的錯誤。
+從完整課程 JS 建立新版本：
 
-同時檢查：必要欄位、`\( \)` 是否成對、`formula.tex` 誤寫 `$$`、
-`document.getElementById` 誤用、SVG viewBox 版面、`index.html` 載入一致性、快取版本號。
-
-要一併擋掉不該出現的內容（例如超出該年級範圍的名詞）：
-
-```bash
-node scripts/verify_deck.js 我的複習網站 --forbid "連比,判別式,斜率"
+```powershell
+python scripts/new_deck.py --mode inquiry --out my-juice --title "果汁探究" --chapters "課堂探究::1-1 情境" --lesson examples/juice-lesson.js
 ```
 
-### 4. 預覽
+`--lesson` 採用 JS 內的完整章節與頁面。輸出已有 `index.html` 時會停止，確定覆寫才加 `--force`；不要重建已填好教材的資料夾。
 
-```bash
-python -m http.server 8890 --directory 我的複習網站
+### 原版複習模式
+
+```powershell
+python scripts/new_deck.py --mode review --out review --title "整數運算複習" --chapters "整數::1-1 加減"
+node scripts/verify_deck.js review
 ```
 
-> ⚠️ 用 `file://` 直接開，部分環境會當成靜態快照而不執行 JS，請起伺服器。
+`review` 是預設模式，原 `points`、`formula`、`visual`、`example` 格式繼續有效。參閱 [上游 README](references/upstream-readme.md) 與 [原投影片規格](references/slide-spec.md)。
 
-### 5. 部署
+## 開發與驗證
 
-```bash
-npx wrangler pages deploy 我的複習網站 --project-name 我的專案名 --branch main --commit-dirty=true
+```powershell
+node --test tests/model.test.cjs tests/schema.test.cjs
+python tests/generator_test.py
 ```
 
-其他方式（Netlify／GitHub Pages）與踩坑紀錄見 [`references/deploy.md`](references/deploy.md)。
+瀏覽器測試另需 Playwright：
 
----
-
-## 文件
-
-| 檔案 | 內容 |
-|---|---|
-| [`SKILL.md`](SKILL.md) | AI Agent 用的技能說明（工作流程、硬性規則、品質判準） |
-| [`references/slide-spec.md`](references/slide-spec.md) | `chN.js` 完整格式規格 |
-| [`references/svg-toolkit.md`](references/svg-toolkit.md) | `SV` 幾何工具庫 API |
-| [`references/interaction-patterns.md`](references/interaction-patterns.md) | 八種實測有效的互動模式 |
-| [`references/deploy.md`](references/deploy.md) | 部署與改版注意事項 |
-| [`examples/ch-example.js`](examples/ch-example.js) | 五種頁型的完整範例章 |
-
----
-
-## 當作 Claude Code / Codex Skill 使用
-
-```bash
-# Claude Code
-git clone https://github.com/mathruffian-dot/math-review-deck.git ~/.claude/skills/math-review-deck
-
-# 或 Codex / OpenCode
-git clone https://github.com/mathruffian-dot/math-review-deck.git ~/.codex/skills/math-review-deck
+```powershell
+npm install --no-save --package-lock=false playwright@1.62.1
+npx playwright install chromium
+# 另一個終端先執行 python -m http.server 8890
+node tests/browser.cjs
 ```
 
-裝好後直接說「幫我做一份 XX 的全冊複習簡報」即可觸發。
+測試預設連線 `http://127.0.0.1:8890`。可用 `BASE_URL`、`PLAYWRIGHT_MODULE`、`BROWSER_EXECUTABLE` 指定網址、套件與瀏覽器位置；`SCREENSHOT_DIR` 可輸出截圖。GitHub Actions 執行數學模型、結構、雙模式產生器及瀏覽器測試。
 
----
+離線驗證器只檢查探究頁結構，不代替瀏覽器操作；舊複習驗證器使用模擬 DOM，滑桿掃描有上限。詳見 [驗證紀錄](references/validation.md)。
 
-## 幾個容易踩的坑
+## Repo 結構
 
-1. **改了 `chN.js` 要同步更新 `index.html` 的 `?v=` 版本號**，
-   否則瀏覽器會拿快取的舊章節，你會以為改動沒生效。
-2. **`visual` 內只能用 `h.querySelector`**，不可用 `document.getElementById`——
-   所有投影片共用同一個文件，id 會跨頁打架。
-3. **SVG viewBox 寬高比不要低於 1.35**、高度 ≤320（有滑桿的 ≤300），否則會被縮到看不清。
-4. **`points` 最多 4 條、每條 ≤45 字**。
-5. 多份簡報共用同一份 `engine.js`／`style.css`／`svg.js`，
-   改了要**每個資料夾都複製一次**再各自部署。
+```text
+assets/                  引擎、樣式、探究互動與數學模型
+demo/juice/              可直接播放的完整示範課
+examples/juice-lesson.js  課程內容來源
+scripts/                 雙模式產生器、示範課重建、驗證器
+tests/                   模型、結構、產生器、瀏覽器測試
+references/              規格、教師引導、驗證及上游文件
+SKILL.md                 AI 製作探究課的工作規則
+```
 
-以上都會被 `verify_deck.js` 檢查出來。
+## 資料保存與分享
 
----
+作答不傳送至伺服器，沒有教師後台、跨裝置同步或多人即時協作。儲存依瀏覽器來源（網域與連接埠）、課程 id、版本區分；更換後不自動帶入舊資料。共用裝置下課前請先匯出，再重設。儲存被禁止時會提示只能暫存，仍可匯出。
 
-## 相依
+參考答案在前端程式內，適合教學揭示，不具考試保密功能。
 
-- **執行簡報**：只要瀏覽器＋網路（載入 MathJax CDN）
-- **產生骨架**：Python 3.7+
-- **驗證**：Node.js 14+
+Repo 或產生的資料夾可放到靜態主機。本次建立 Repo 不會自動開啟 GitHub Pages；參考 [部署文件](references/deploy.md)，服務方案及操作以供應商當時文件為準。
 
-## 授權
+## 授權與來源
 
-MIT
+MIT。保留原作者 mathruffian-dot 的授權與提交歷史，上游基準提交 `198626115258b6998f044fe94408e1b668c66ee2`。原始學校 Word 文件、學校版頭與學生資料不收錄於 Repo。詳見 [LICENSE](LICENSE) 與 [NOTICE](NOTICE.md)。

@@ -160,6 +160,14 @@ for (const f of chFiles) {
 }
 
 const DECK = sandbox.window.DECK || [];
+const inquiryMode = sandbox.window.DECK_CONFIG && sandbox.window.DECK_CONFIG.mode === 'inquiry';
+const inquiryIds = new Set();
+if (inquiryMode) {
+  const config = sandbox.window.DECK_CONFIG;
+  if (!config.id || !Number.isInteger(config.version) || config.version < 1) err('探究設定須有 id 及正整數 version');
+  if (!Array.isArray(config.phases) || config.phases.length !== 5) err('探究設定須有五階段 phases');
+  for (const f of ['inquiry.js', 'inquiry-model.js', 'inquiry.css']) if (!fs.existsSync(path.join(dir, f))) err('探究模式缺少 ' + f);
+}
 if (!DECK.length) err('window.DECK 是空的——章節檔沒有成功 push');
 
 /* ---------- 逐章逐頁檢查 ---------- */
@@ -183,10 +191,21 @@ DECK.forEach((chap, ci) => {
     slideCount++;
     const tag = `${where} 第 ${si + 1} 頁「${String(s.title || '(無標題)').replace(/<[^>]*>/g, '').slice(0, 22)}」`;
 
-    ['sec', 'secName', 'title', 'points', 'visual'].forEach((k) => {
+    (inquiryMode ? ['id','kind','phase','sec','secName','title','prompt'] : ['sec', 'secName', 'title', 'points', 'visual']).forEach((k) => {
       if (s[k] === undefined || s[k] === null || s[k] === '') err(`${tag}：缺少必要欄位 ${k}`);
     });
     if (s.sec) secsInChapter.add(s.sec);
+    if (inquiryMode) {
+      if (inquiryIds.has(s.id)) err(`${tag}：重複 id ${s.id}`);
+      inquiryIds.add(s.id);
+      const kinds = ['question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
+      if (!kinds.includes(s.kind)) err(`${tag}：未知 kind ${s.kind}`);
+      if (!Number.isInteger(s.phase) || s.phase < 0 || s.phase > 4) err(`${tag}：phase 須為 0 至 4`);
+      if (s.reveals && (!Array.isArray(s.reveals) || s.reveals.some(t => typeof t !== 'string'))) err(`${tag}：reveals 須為字串陣列`);
+      if (s.kind === 'question' && s.choices && (!Array.isArray(s.choices) || s.choices.length < 2)) err(`${tag}：choices 至少兩項`);
+      forbidArg.forEach(w => { if (JSON.stringify(s).includes(w)) err(`${tag}：出現禁用詞「${w}」`); });
+      return;
+    }
 
     if (Array.isArray(s.points)) {
       if (s.points.length > 4) warn(`${tag}：points 有 ${s.points.length} 條（建議 ≤4，過多會擠）`);
@@ -307,18 +326,18 @@ if (fs.existsSync(idxPath)) {
   else if (vers.length === 1) info.push(`資源版本號 ?v=${vers[0]}`);
   else warn('index.html 沒有 ?v= 版本號，改版後瀏覽器可能拿到快取的舊檔');
 
-  ['engine.js', 'style.css', 'svg.js'].forEach((f) => {
+  (inquiryMode ? ['engine.js','style.css','svg.js','inquiry-model.js','inquiry.js','inquiry.css'] : ['engine.js', 'style.css', 'svg.js']).forEach((f) => {
     if (!idx.includes(f)) err(`index.html 沒有載入 ${f}`);
   });
 }
 
 /* ---------- 報告 ---------- */
-const pages = slideCount + DECK.length;
+const pages = slideCount + (inquiryMode ? 0 : DECK.length);
 if (!quiet) {
   console.log('');
   console.log('📊 ' + path.resolve(dir));
   console.log(`   ${DECK.length} 章、${slideCount} 張重點頁（含章名頁共 ${pages} 頁）`);
-  console.log(`   互動頁 ${interactive} 張（${slideCount ? Math.round(interactive / slideCount * 100) : 0}%）、含範例 ${withExample} 張`);
+  console.log(inquiryMode ? '   探究頁型結構已檢查；實際操作另跑 tests/browser.cjs' : `   互動頁 ${interactive} 張（${slideCount ? Math.round(interactive / slideCount * 100) : 0}%）、含範例 ${withExample} 張`);
   info.forEach((m) => console.log('   ' + m));
   console.log('');
 }

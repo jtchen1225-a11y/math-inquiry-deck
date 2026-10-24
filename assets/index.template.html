@@ -6,6 +6,7 @@
   <title>{{TITLE}}</title>
   <meta name="description" content="{{DESCRIPTION}}" />
   <link rel="stylesheet" href="style.css?v={{VERSION}}" />
+  {{EXTRA_STYLES}}
   <script>
     window.MathJax = {
       tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
@@ -101,6 +102,7 @@
 
   <script src="svg.js?v={{VERSION}}"></script>
 {{CHAPTER_SCRIPTS}}
+{{INQUIRY_SCRIPTS}}
   <script src="engine.js?v={{VERSION}}"></script>
 </body>
 </html>

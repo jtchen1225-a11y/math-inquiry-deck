@@ -4,11 +4,16 @@
    ============================================================ */
 (function () {
   const DECK = window.DECK || [];
+  const inquiryMode = window.DECK_CONFIG && window.DECK_CONFIG.mode === 'inquiry';
+  if (inquiryMode) {
+    document.body.classList.add('inquiry-mode');
+    document.getElementById('startBtn').textContent = '開始探究 →';
+  }
 
   // 攤平：每章先放一張章名分隔頁，再放內容頁
   const flat = [];
   DECK.forEach((chap, ci) => {
-    flat.push({ type: 'divider', ch: chap.ch, color: chap.color, title: chap.title, sections: chap.sections });
+    if (!inquiryMode) flat.push({ type: 'divider', ch: chap.ch, color: chap.color, title: chap.title, sections: chap.sections });
     chap.slides.forEach(s => flat.push(Object.assign({ type: 'slide', ch: chap.ch, color: chap.color }, s)));
   });
 
@@ -36,7 +41,7 @@
     }
   }
   function fitSlide() {
-    if (!slideEl || slideEl.classList.contains('divider')) return;
+    if (!slideEl || slideEl.classList.contains('divider') || inquiryMode) return;
     const info = slideEl.querySelector('.slide-info');
     if (info) fitEl(info, info.querySelector('.col-fit'));
     const vis = slideEl.querySelector('.slide-visual');
@@ -223,7 +228,10 @@
     const s = flat[idx];
     slideEl.style.setProperty('--ct', s.color);
 
-    if (s.type === 'divider') {
+    if (inquiryMode && s.kind) {
+      window.Inquiry.render(slideEl, s);
+      crumbEl.textContent = `${s.sec} · ${s.secName || ''}`;
+    } else if (s.type === 'divider') {
       slideEl.className = 'slide divider';
       slideEl.innerHTML = `
         <div>
@@ -316,7 +324,7 @@
     markTOC();
 
     // MathJax（若尚未載入完成，typeset 會自動重試補上）；排版後自動縮放使整頁免捲動
-    typesetAndFit(slideEl);
+    if (!inquiryMode) typesetAndFit(slideEl);
     slideEl.scrollTop = 0;
     if (typeof clearPen === 'function') clearPen(); // 換頁清除筆跡
   }
@@ -477,6 +485,8 @@
   fitPen();
 
   document.addEventListener('keydown', e => {
+    // Let form fields and accessible controls keep their native keys.
+    if (e.target.closest('input, textarea, select, button, [contenteditable="true"], [role="button"]')) return;
     if ($('app').classList.contains('hidden')) {
       if (e.key === 'Enter' || e.key === ' ') { $('startBtn').click(); }
       return;

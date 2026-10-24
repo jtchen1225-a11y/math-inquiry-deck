@@ -1,0 +1,11 @@
+{
+  "name": "math-inquiry-deck",
+  "version": "1.0.0",
+  "private": true,
+  "description": "以猜想、實驗、證據與論證為核心的課堂探究網頁簡報框架",
+  "scripts": {
+    "test": "node --test tests/model.test.cjs tests/schema.test.cjs",
+    "test:browser": "node tests/browser.cjs"
+  },
+  "license": "MIT"
+}

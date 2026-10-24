@@ -2,3 +2,21 @@ __pycache__/
 *.pyc
 .DS_Store
 node_modules/
+
+# Classroom records and local tools
+.env
+.env.*
+*.key
+credentials.*
+secrets.*
+.codex/
+.claude/
+dist/
+build/
+.cache/
+playwright-report/
+test-results/
+*.docx
+*-records.json
+Thumbs.db
+~$*

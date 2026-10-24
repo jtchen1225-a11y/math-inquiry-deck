@@ -1,0 +1,26 @@
+name: Verify inquiry and review modes
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/model.test.cjs tests/schema.test.cjs
+      - run: python tests/generator_test.py
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - name: Browser tests
+        run: |
+          python -m http.server 8890 --bind 127.0.0.1 > /tmp/inquiry-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          python -c "import urllib.request,time; time.sleep(1); urllib.request.urlopen('http://127.0.0.1:8890/demo/juice/', timeout=10)"
+          node tests/browser.cjs

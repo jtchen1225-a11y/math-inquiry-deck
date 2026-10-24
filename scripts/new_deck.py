@@ -16,6 +16,9 @@
 （色碼留空會依章序自動套用內建配色）
 """
 import argparse
+import json
+from html import escape
+import re
 import datetime
 import os
 import shutil
@@ -135,6 +138,9 @@ def main():
             pass
 
     p = argparse.ArgumentParser(description='產生互動複習簡報骨架')
+    p.add_argument('--mode', choices=['review', 'inquiry'], default='review', help='複習或課堂探究模式')
+    p.add_argument('--lesson', help='探究模式：使用既有完整課程 JS（例如 examples/juice-lesson.js）')
+    p.add_argument('--force', action='store_true', help='明確允許覆寫輸出檔案')
     p.add_argument('--out', required=True, help='輸出資料夾')
     p.add_argument('--title', required=True, help='瀏覽器分頁標題')
     p.add_argument('--eyebrow', default='', help='封面上方小字')
@@ -149,11 +155,24 @@ def main():
     a = p.parse_args()
 
     out = os.path.abspath(a.out)
+    if os.path.exists(os.path.join(out, 'index.html')) and not a.force:
+        p.error('輸出已有 index.html；請另選資料夾，或明確加上 --force')
+    if a.lesson and a.mode != 'inquiry':
+        p.error('--lesson 只能與 --mode inquiry 一起使用')
+    if a.lesson and len(a.chapters) != 1:
+        p.error('--lesson 請搭配一個 --chapters 項目；課程可在 JS 內自行定義多章')
+    lesson_source = None
+    if a.lesson:
+        with open(a.lesson, encoding='utf-8') as fh:
+            lesson_source = fh.read()
     os.makedirs(out, exist_ok=True)
     for f in ('engine.js', 'style.css', 'svg.js'):
         shutil.copy(os.path.join(ASSETS, f), os.path.join(out, f))
 
-    version = datetime.date.today().strftime('%Y%m%d')
+    if a.mode == 'inquiry':
+        for f in ('inquiry.js', 'inquiry-model.js', 'inquiry.css'):
+            shutil.copy(os.path.join(ASSETS, f), os.path.join(out, f))
+    version = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     chapters = [parse_chapter(c, i) for i, c in enumerate(a.chapters)]
 
     for i, (title, color, sections) in enumerate(chapters, start=1):
@@ -171,27 +190,59 @@ def main():
             'seclist': '、'.join(sections),
             'slides': ',\n\n      '.join(slides),
         }
+        if a.mode == 'inquiry':
+            chapter = {'ch': i, 'title': title, 'color': color, 'sections': sections, 'slides': []}
+            for k, sec in enumerate(sections):
+                code = sec.split()[0]
+                phases = [
+                    ('question', '你會如何判斷？', '請以教材中的真實情境提出問題，記下初步猜想與理由。'),
+                    ('task', '你會怎樣設計實驗？', '確定固定量與變數，操作實體或數位教具，把觀察寫下來。'),
+                    ('task', '哪些數據值得記錄？', '整理測量、計算與觀察，指出能支持或推翻猜想的證據。'),
+                    ('argument', '你的證據能支持主張嗎？', '亮主張、擺證據、說道理、破迷思。'),
+                    ('task', '換一個情境，仍然成立嗎？', '以新的生活任務檢查規律，記錄解法與反思。')]
+                for phase, (kind, page_title, prompt) in enumerate(phases):
+                    slide = {'id': 'ch%d-s%d-p%d' % (i,k+1,phase), 'kind': kind, 'phase': phase,
+                             'sec': code, 'secName': sec[len(code):].strip() or code,
+                             'title': page_title, 'prompt': prompt}
+                    if kind == 'question':
+                        slide['choices'] = ['我同意', '我不同意', '需要更多證據']
+                    chapter['slides'].append(slide)
+            config = {'mode': 'inquiry', 'id': os.path.basename(out), 'version': 1,
+                      'phases': ['先判斷', '動手調配', '記錄數據', '提出論證', '應用遷移']}
+            src = ('window.DECK_CONFIG = ' + json.dumps(config, ensure_ascii=False) + ';\n' if i == 1 else '') + \
+                  'window.DECK = window.DECK || [];\nwindow.DECK.push(' + json.dumps(chapter, ensure_ascii=False, indent=2) + ');\n'
         with open(os.path.join(out, 'ch%d.js' % i), 'w', encoding='utf-8', newline='\n') as fh:
             fh.write(src)
 
+    if lesson_source is not None:
+        if len(chapters) != 1:
+            p.error('--lesson 請搭配一個 --chapters 項目；課程可在 JS 內自行定義多章')
+        with open(os.path.join(out, 'ch1.js'), 'w', encoding='utf-8', newline='\n') as fh:
+            fh.write(lesson_source)
     tpl = open(os.path.join(ASSETS, 'index.template.html'), encoding='utf-8').read()
+    if a.mode == 'inquiry':
+        tpl = re.sub(r'  <script>.*?</script>\s*<script src="https://cdn.jsdelivr.net/.*?</script>', '', tpl, count=1, flags=re.S)
+    tpl = tpl.replace('{{EXTRA_STYLES}}', '<link rel="stylesheet" href="inquiry.css?v=' + version + '" />' if a.mode == 'inquiry' else '')
+    tpl = tpl.replace('{{INQUIRY_SCRIPTS}}', '\n'.join('  <script src="' + f + '?v=' + version + '"></script>' for f in ('inquiry-model.js', 'inquiry.js')) if a.mode == 'inquiry' else '')
     scripts = '\n'.join('  <script src="ch%d.js?v=%s"></script>' % (i, version)
                         for i in range(1, len(chapters) + 1))
-    html = (tpl.replace('{{TITLE}}', a.title)
-               .replace('{{DESCRIPTION}}', a.description or a.title)
-               .replace('{{EYEBROW}}', a.eyebrow)
-               .replace('{{COVER_TITLE}}', a.cover_title or a.title)
-               .replace('{{COVER_SUB}}', a.sub)
-               .replace('{{HOME_LABEL}}', a.home)
+    html = (tpl.replace('{{TITLE}}', escape(a.title, quote=True))
+               .replace('{{DESCRIPTION}}', escape(a.description or a.title, quote=True))
+               .replace('{{EYEBROW}}', escape(a.eyebrow, quote=True))
+               .replace('{{COVER_TITLE}}', escape(a.cover_title or a.title, quote=True))
+               .replace('{{COVER_SUB}}', escape(a.sub, quote=True))
+               .replace('{{HOME_LABEL}}', escape(a.home, quote=True))
                .replace('{{VERSION}}', version)
                .replace('{{CHAPTER_SCRIPTS}}', scripts))
     with open(os.path.join(out, 'index.html'), 'w', encoding='utf-8', newline='\n') as fh:
         fh.write(html)
 
-    total = sum(len(s) for _, _, s in chapters) * a.slides_per_section
+    total = sum(len(s) for _, _, s in chapters) * (5 if a.mode == 'inquiry' else a.slides_per_section)
     print('✅ 已建立 %s' % out)
-    print('   %d 章、%d 張骨架投影片（含章名頁共 %d 頁）'
-          % (len(chapters), total, total + len(chapters)))
+    if lesson_source is not None:
+        print('   已載入完整課程，頁數以驗證器統計為準')
+    else:
+        print('   %d 章、%d 張骨架投影片' % (len(chapters), total))
     print('   資源版本號 ?v=%s' % version)
     print()
     print('下一步：')
