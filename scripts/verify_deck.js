@@ -172,6 +172,7 @@ const inquiryMode = sandbox.window.DECK_CONFIG && sandbox.window.DECK_CONFIG.mod
 const inquiryIds = new Set();
 if (inquiryMode) {
   const config = sandbox.window.DECK_CONFIG;
+  if (config.ageBand === 'p3') for (const f of ['junior.js','junior-model.js','junior.css','junior-access.js','junior-share.js','qrcode.js']) if (!assetExists(f)) err('小三課程缺少 ' + f);
   if (config.ageBand === 'p1') for (const f of ['primary.js','primary-model.js','primary.css']) if (!assetExists(f)) err('小一課程缺少 ' + f);
   if (!config.id || !Number.isInteger(config.version) || config.version < 1) err('探究設定須有 id 及正整數 version');
   if (!Array.isArray(config.phases) || config.phases.length < 2 || config.phases.length > 8) err('探究設定須有2至8個階段 phases');
@@ -207,7 +208,7 @@ DECK.forEach((chap, ci) => {
     if (inquiryMode) {
       if (inquiryIds.has(s.id)) err(`${tag}：重複 id ${s.id}`);
       inquiryIds.add(s.id);
-      const kinds = ['primary','p1-talk','question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
+      const kinds = ['junior','primary','p1-talk','question','task','annotation','lab','representation','records','scale','rule','argument','practice','percent','algorithm','reflection'];
       if (!kinds.includes(s.kind)) err(`${tag}：未知 kind ${s.kind}`);
       const themes = ['citrus','ocean','lime','coral','violet','berry','teal'];
       if (s.theme && typeof s.theme === 'string' && !themes.includes(s.theme)) err(`${tag}：未知 theme ${s.theme}`);

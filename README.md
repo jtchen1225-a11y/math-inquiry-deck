@@ -6,6 +6,10 @@
 
 ## 線上使用
 
+**[小三30週教師開課台](https://jtchen1225-a11y.github.io/math-inquiry-deck/junior/)**：30份獨立簡報，共360頁。保留原六步、兩道練習、生活應用及課本對照，增加三次條件比較、方法核對、反例與說理。教具涵蓋乘除位值、貨幣方案、周界、面積、時間、分數、積木三視圖與放回抽珠。見[小三教師指南](references/junior-guide.md)。
+
+教師選本週「打開本週二維碼」，學生掃碼直達當週；再按「教師進入本課」，課內工具列也有「本週二維碼」。學生端沒有其他週入口；直接輸入週次網址或帶錯週碼時提示重新掃描。收起二維碼只隱藏投影，已分享連結仍有效。這是公開靜態網站的課堂導流，沒有教師認證或跨裝置即時鎖課，不是考試存取保護。
+
 **[小一30週六步探究課程](https://jtchen1225-a11y.github.io/math-inquiry-deck/primary/)**：每份工作紙各有一份獨立互動簡報，共30份、300頁。保留六步、原來兩道練習與生活應用，教具包括十格陣、分合盤、平衡、聯動教學鐘、月曆、硬幣、購物、量尺、七巧板、統計及數獨。詳細對照見 [小一教師指南](references/primary-guide.md)。
 
 **[開啟果汁探究課](https://jtchen1225-a11y.github.io/math-inquiry-deck/demo/juice/)** · [網站入口](https://jtchen1225-a11y.github.io/math-inquiry-deck/)
@@ -72,6 +76,7 @@ python -m http.server 8890 --directory my-lesson
 ```powershell
 python scripts/build_demo.py
 python scripts/build_primary.py
+python scripts/build_junior.py
 ```
 
 從完整課程 JS 建立新版本：
@@ -94,14 +99,14 @@ node scripts/verify_deck.js review
 ## 開發與驗證
 
 ```powershell
-node --test tests/model.test.cjs tests/schema.test.cjs tests/primary.test.cjs
+node --test tests/model.test.cjs tests/schema.test.cjs tests/primary.test.cjs tests/junior.test.cjs
 python tests/generator_test.py
 ```
 
 瀏覽器測試另需 Playwright：
 
 ```powershell
-npm install --no-save --package-lock=false playwright@1.62.1
+npm install --no-save --package-lock=false playwright@1.62.1 jsqr@1.4.0
 npx playwright install chromium webkit
 # 另一個終端先執行 python -m http.server 8890
 node tests/browser.cjs
@@ -151,3 +156,14 @@ SKILL.md                 AI 製作探究課的工作規則
 ## 授權與來源
 
 MIT。保留原作者 mathruffian-dot 的授權與提交歷史，上游基準提交 `198626115258b6998f044fe94408e1b668c66ee2`。原始學校 Word 文件、學校版頭與學生資料不收錄於 Repo。詳見 [LICENSE](LICENSE) 與 [NOTICE](NOTICE.md)。
+
+### 小三開發驗證
+
+```powershell
+python scripts/build_junior.py
+node --test tests/junior.test.cjs
+$env:JSQR_MODULE="node_modules/jsqr/dist/jsQR.js"
+node tests/junior-browser.cjs
+```
+
+小三共用資產均在 assets/；junior/week01/ 至 week30/ 各12頁。GitHub Actions 對Chromium與WebKit執行360頁結構、教具操作、iPad橫直向、錯週入口及二維碼解碼，再部署。原DOCX不納入網站或Repo；保留工作紙來源檔名作對照。

@@ -51,3 +51,9 @@ node tests/browser.cjs
 ```
 
 瀏覽器依賴與啟動方法見 README。不得把結構驗證通過寫成全部互動已驗證。
+
+## 小三六步與教師開課
+
+小三30週每份12頁，來源 lessons/junior/lessons.json，用 scripts/build_junior.py 重建。模型在 junior-model.js，操作在 junior.js。三次比較對應原表格，保留原題數據、兩道練習及生活應用；增加條件比較、反例和核對。
+
+教師台 junior/ 按週顯示二維碼；教師課內工具列也可顯示該課碼。學生入口無跨週導覽。入口碼只防止誤入，不提供身分驗證或即時關課。不能保存或匯出學生作答。實物重量不可用預設示意值冒充。部署前執行 junior.test.cjs 及 junior-browser.cjs，含30週二維碼實際解碼與錯週阻擋。

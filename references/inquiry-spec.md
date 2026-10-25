@@ -80,3 +80,7 @@ inquiry.css 只覆寫 `.inquiry-mode` 或探究專用類別，不改 review 頁�
 ## 小一共用資產課程
 
 `python scripts/build_primary.py` 從 lessons/primary/lessons.json 產生 primary/week01 至 week30。各課只有 index.html 與 ch1.js，引用 ../../assets；驗證器會依HTML檢查共用資產。載入 primary-model.js、primary.js、primary.css 後，`kind: primary` 使用 `app.type` 選擇教具。`ageBand: p1` 顯示適齡輪流操作提示。原果汁課的五步設定與雙模式產生器維持相容。
+
+## 小三共用資產與入口
+
+`ageBand: p3`，`kind: junior`，`app.type`選教具，`app.cases`設定條件比較。載入junior-model.js、junior.js、junior.css，模型保持純函式。執行build_junior.py，生成30份各12頁與教師台。學生入口網址帶週次專屬entry碼；沒有或不匹配會顯示掃碼提示。teacher=1只是教師介面旗標，會顯示本週二維碼按鈕，不作身分驗證。學生網址不帶teacher旗標。公開靜態入口不具即時鎖課能力，不能把隱藏QR說成撤銷存取。所有教具及草稿不保存、不匯出。

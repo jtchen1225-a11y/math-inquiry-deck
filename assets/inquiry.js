@@ -74,6 +74,7 @@
   }
   function activity(s) {
     switch(s.kind) {
+      case 'junior': return window.Junior.view(s);
       case 'primary': return window.Primary.view(s);
       case 'p1-talk': return '<div class="reflection-grid">' + ['我發現甚麼？','我的圖或實物在哪裡？','換一個例子還成立嗎？'].map(t=>'<section><b>'+t+'</b><p>指一指、擺一擺，或說給同伴聽。</p></section>').join('') + '</div>' + paper('可畫圖、圈畫或口述，不用抄寫長句。') + reveal(s);
       case 'question': return `${s.context?'<div class="primary-context"><span>'+esc(s.context.icon)+'</span><b>'+esc(s.context.label)+'</b></div>':''}${s.labels?labels():''}<fieldset class="choices"><legend>小組先選一個猜想</legend>${(s.choices||['我同意','我不同意','需要更多證據']).map(t=>`<label><input type="radio" name="prediction" value="${esc(t)}" data-choice="${s.id}" ${state.choices[s.id]===t?'checked':''}>${esc(t)}</label>`).join('')}</fieldset>${paper('把最初判斷與理由寫在工作紙，稍後用實驗證據檢查。')}`;
@@ -148,11 +149,11 @@
         case 'part-total':h.querySelector('.representation-output').textContent='1＋4＝5 份。整杯包含果汁與清水。';break;
         case 'part-ratio':h.querySelector('.representation-output').textContent='果汁 ÷ 清水＝1÷4＝0.25（部分比部分）。';break;
         case 'part-concentration':h.querySelector('.representation-output').textContent='果汁 ÷ 整杯＝1÷(1＋4)＝20%（部分比整體）。';break;
-        case 'reset':if(window.confirm('重新開始這一課？目前的操作、比較配方和臨時書寫會清空。')){state=fresh();if(window.Primary)window.Primary.reset();render(h,s);}break;
+        case 'reset':if(window.confirm('重新開始這一課？目前的操作、比較配方和臨時書寫會清空。')){state=fresh();if(window.Primary)window.Primary.reset();if(window.Junior)window.Junior.reset();render(h,s);}break;
       }
     });
     const sketchCleanup=bindSketch(h,s);
-    const activityCleanup=window.Primary?window.Primary.bind(h,s):null;
+    const activityCleanup=s.kind==='junior'?window.Junior.bind(h,s):(window.Primary?window.Primary.bind(h,s):null);
     disposeSketch=()=>{if(sketchCleanup)sketchCleanup();if(activityCleanup)activityCleanup();};
   }
   window.Inquiry={render,palette};

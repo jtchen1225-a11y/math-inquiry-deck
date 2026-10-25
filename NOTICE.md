@@ -12,3 +12,7 @@
 示範課依使用者提供的「第01週 果汁濃度與比值的本質 課堂探究單」之數學情境及活動順序重新編排。Repo 不含原始 Word 文件、學校版頭、學生資料或作答匯出檔。
 
 上游 README、Skill 保留於 references/upstream-readme.md 及 references/upstream-skill.md；新增模式以本專案 README 及 references/inquiry-spec.md 為準。
+
+## 小三版本與二維碼
+
+小三30份課程按使用者提供的六步探究工作紙轉製，原始DOCX不公開。qrcode-generator 1.4.4（Kazuhiko Arase，MIT）收錄於 assets/qrcode.js，完整授權見 references/qrcode-LICENSE.txt。二維碼在瀏覽器本機產生，不使用第三方圖片或追蹤服務。

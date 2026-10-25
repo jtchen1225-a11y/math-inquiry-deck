@@ -15,3 +15,8 @@
 - 不提交原始 DOCX、學生作答匯出、密鑰或本機工具設定。
 - 使用者已授權此公開 Repo 部署 GitHub Pages；main 通過 Chromium／WebKit 檢查後部署。
 - 預期 Obsidian vault：`G:\我的雲端硬碟\secondbrain`。建立時 MCP 回報路徑不存在，尚未建立專案筆記；恢復後再同步，勿寫入其他 vault。
+
+- 小三主資料 lessons/junior/lessons.json，執行 scripts/build_junior.py 產生30份共360頁。保留原六步、兩題練習、生活應用及課本對照。
+- 小三模型及教具為 junior-model.js／junior.js，測試 tests/junior.test.cjs 和 tests/junior-browser.cjs。跨頁草稿仍只在記憶體。
+- 小三學生入口需對應週次的 entry 路由碼，教師從 junior/ 開二維碼，或在 teacher=1 的課內按本週二維碼。此為防誤入導流，公開碼不代表認證；不得宣稱即時鎖課或可撤銷連結。
+- qrcode-generator為已附MIT授權的本機依賴；瀏覽器測試以獨立jsQR解碼驗證，不傳出作答。
